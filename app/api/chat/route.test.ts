@@ -36,11 +36,19 @@ import { POST } from './route';
 import { streamText } from 'ai';
 
 describe('POST /api/chat', () => {
-  it('returns a streaming response and passes messages + tool to streamText', async () => {
+  it('converts UIMessage[] to ModelMessage[] before passing to streamText', async () => {
     const req = new Request('http://localhost/api/chat', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ messages: [{ role: 'user', content: 'flights syd to dps' }] }),
+      body: JSON.stringify({
+        messages: [
+          {
+            id: '1',
+            role: 'user',
+            parts: [{ type: 'text', text: 'flights syd to dps' }],
+          },
+        ],
+      }),
     });
     const res = await POST(req);
     expect(res.status).toBe(200);
@@ -48,8 +56,15 @@ describe('POST /api/chat', () => {
     expect(streamText).toHaveBeenCalledOnce();
     const args = (streamText as unknown as { mock: { calls: unknown[][] } }).mock.calls[0][0] as Record<string, unknown>;
     expect(args.system).toBe('SYS');
-    expect(Array.isArray(args.messages)).toBe(true);
     expect(args.tools).toHaveProperty('firecrawl');
+    // Critical: messages were converted from UIMessage parts shape to ModelMessage content shape.
+    const msgs = args.messages as Array<{ role: string; content: unknown }>;
+    expect(Array.isArray(msgs)).toBe(true);
+    expect(msgs[0].role).toBe('user');
+    // ModelMessage content is either a string or an array of content parts with type 'text'.
+    const c = msgs[0].content;
+    const text = typeof c === 'string' ? c : (c as Array<{ type: string; text: string }>)[0]?.text;
+    expect(text).toBe('flights syd to dps');
   });
 
   it('rejects bad json', async () => {

@@ -1,4 +1,4 @@
-import { streamText, stepCountIs } from 'ai';
+import { streamText, stepCountIs, convertToModelMessages, type UIMessage } from 'ai';
 import { groq } from '@ai-sdk/groq';
 import { buildSystemPrompt } from '@/lib/prompt';
 import { firecrawlTool } from '@/lib/firecrawl';
@@ -14,17 +14,20 @@ export async function POST(req: Request): Promise<Response> {
     return new Response('bad json', { status: 400 });
   }
 
-  const messages = Array.isArray(body.messages) ? body.messages : [];
+  const uiMessages = Array.isArray(body.messages) ? (body.messages as UIMessage[]) : [];
+
+  // useChat / assistant-ui send UIMessage[] (parts-shaped); streamText needs ModelMessage[].
+  // convertToModelMessages is async in ai v6 — must await before passing.
+  const modelMessages = await convertToModelMessages(uiMessages);
 
   const result = streamText({
     model: groq('moonshotai/kimi-k2-instruct'),
     system: buildSystemPrompt(),
-    messages,
+    messages: modelMessages,
     tools: { firecrawl: firecrawlTool },
     maxOutputTokens: 2000,
     stopWhen: stepCountIs(8),
   });
 
-  // ai v5: toUIMessageStreamResponse() (v4 used toDataStreamResponse)
   return result.toUIMessageStreamResponse();
 }
