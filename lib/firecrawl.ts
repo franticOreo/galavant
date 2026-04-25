@@ -38,7 +38,7 @@ export const firecrawlTool = tool({
   description:
     'Scrape a URL via Firecrawl /v2/scrape. Returns markdown of the rendered page. ' +
     'Use this for any flight-search URL. See TRAVEL_SKILL.md for site URL templates.',
-  parameters: z.object({
+  inputSchema: z.object({
     url: z.string().url(),
     waitFor: z
       .number()
