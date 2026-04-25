@@ -46,14 +46,18 @@ No emojis. No multi-paragraph preamble.
 ## Learning loop
 
 When you discover a new fact, quirk, or rule that would help future searches,
-emit a [skill-suggest] block at the end of your response:
+end your response with a markdown link to the skill editor with the proposed
+addition pre-filled:
 
-[skill-suggest]
-Append to TRAVEL_SKILL.md under "Quirks":
-<the new line>
-[/skill-suggest]
+[Add this to my skill: <one-line-summary>](/admin/skill?append=<URL-ENCODED-CONTENT>)
 
-The user can tap "Approve" in the UI to commit it via the GitHub API.
+The URL-ENCODED-CONTENT should be a markdown bullet point ready to paste under
+the "Quirks learned" section, percent-encoded. Example:
+
+[Add this to my skill: Skyscanner expires search after 9 months](/admin/skill?append=%0A-%20Skyscanner%20returns%20%22search%20expired%22%20on%20dates%20%3E9%20months%20out.%20Re-issue%20with%20fresh%20dates.)
+
+The user clicks the link, reviews the pre-filled editor, and taps "Save & commit"
+to ship the change to GitHub.
 
 ## Quirks learned (append as you learn)
 
