@@ -66,3 +66,24 @@ Booking.com, Skyscanner, Google Flights, Kayak, Expedia. Expand based on coverag
 4. Pre-filled deep-link generation
 5. Chat wrapper UI
 6. Fallback to computer use for sites that block Firecrawl
+
+## Run locally
+
+```bash
+cp .env.example .env.local
+# fill in FIRECRAWL_API_KEY, GROQ_API_KEY, APP_PASSWORD (>=8 chars), AUTH_SECRET (>=32 chars)
+npm install
+npm run dev
+```
+
+Open `http://localhost:3000`, log in with `APP_PASSWORD`, ask for a flight.
+
+## Test
+
+```bash
+npm test
+```
+
+## Deploy
+
+See `docs/superpowers/specs/2026-04-25-galavant-v1-design.md` § Deploy.
