@@ -10,6 +10,7 @@ export default defineConfig({
     },
   },
   test: {
+    // jsdom (not node) — T12 React component tests need DOM APIs
     environment: "jsdom",
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
