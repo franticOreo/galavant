@@ -6,6 +6,7 @@ type VerifyResult = { ok: true; exp: number } | { ok: false };
 const SECRET = () => {
   const s = process.env.AUTH_SECRET;
   if (!s) throw new Error('AUTH_SECRET is required');
+  if (s.length < 32) throw new Error('AUTH_SECRET must be at least 32 characters');
   return s;
 };
 
@@ -23,8 +24,10 @@ export function signSession({ ttlSeconds }: SignOpts): string {
 }
 
 export function verifySession(cookie: string): VerifyResult {
-  if (!cookie || !cookie.includes('.')) return { ok: false };
-  const [payload, sig] = cookie.split('.');
+  if (!cookie) return { ok: false };
+  const parts = cookie.split('.');
+  if (parts.length !== 2) return { ok: false };
+  const [payload, sig] = parts;
   if (!payload || !sig) return { ok: false };
   const expected = b64url(createHmac('sha256', SECRET()).update(payload).digest());
   const a = Buffer.from(sig);
