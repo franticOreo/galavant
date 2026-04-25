@@ -43,6 +43,18 @@ describe('signSession / verifySession', () => {
   it('rejects malformed input', async () => {
     expect((await verifySession('')).ok).toBe(false);
     expect((await verifySession('no-dot')).ok).toBe(false);
+    expect((await verifySession('a.b.c')).ok).toBe(false);
+  });
+
+  it('rejects invalid base64url in signature', async () => {
+    expect((await verifySession('validlookingpayload.!!!')).ok).toBe(false);
+  });
+
+  it('returns ok=false (not throws) when AUTH_SECRET is unset during verify', async () => {
+    const cookie = await signSession({ ttlSeconds: 60 });
+    delete process.env.AUTH_SECRET;
+    const result = await verifySession(cookie);
+    expect(result.ok).toBe(false);
   });
 
   it('throws if AUTH_SECRET is not set', async () => {
