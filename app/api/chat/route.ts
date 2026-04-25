@@ -21,7 +21,10 @@ export async function POST(req: Request): Promise<Response> {
   const modelMessages = await convertToModelMessages(uiMessages);
 
   const result = streamText({
-    model: groq('moonshotai/kimi-k2-instruct'),
+    // Plan/spec said Kimi K2 but Groq's catalog (Apr 2026) does not list it.
+    // Llama 4 Scout 17B MoE is a solid Groq-available alternative for tool calling.
+    // Swap via env if needed: process.env.GROQ_MODEL ?? default.
+    model: groq(process.env.GROQ_MODEL ?? 'meta-llama/llama-4-scout-17b-16e-instruct'),
     system: buildSystemPrompt(),
     messages: modelMessages,
     tools: { firecrawl: firecrawlTool },
