@@ -6,51 +6,52 @@ beforeEach(() => {
 });
 
 describe('signSession / verifySession', () => {
-  it('round-trips a valid session', () => {
-    const cookie = signSession({ ttlSeconds: 60 });
-    const result = verifySession(cookie);
+  it('round-trips a valid session', async () => {
+    const cookie = await signSession({ ttlSeconds: 60 });
+    const result = await verifySession(cookie);
     expect(result.ok).toBe(true);
-    expect(result.exp).toBeGreaterThan(Math.floor(Date.now() / 1000));
+    if (result.ok) {
+      expect(result.exp).toBeGreaterThan(Math.floor(Date.now() / 1000));
+    }
   });
 
-  it('rejects a tampered cookie', () => {
-    const cookie = signSession({ ttlSeconds: 60 });
+  it('rejects a tampered cookie', async () => {
+    const cookie = await signSession({ ttlSeconds: 60 });
     const [payload] = cookie.split('.');
     const tampered = `${payload}.AAAAAAAA`;
-    const result = verifySession(tampered);
+    const result = await verifySession(tampered);
     expect(result.ok).toBe(false);
   });
 
-  it('rejects a tampered payload (extended exp)', () => {
-    const cookie = signSession({ ttlSeconds: 60 });
+  it('rejects a tampered payload (extended exp)', async () => {
+    const cookie = await signSession({ ttlSeconds: 60 });
     const [, sig] = cookie.split('.');
-    const fakePayload = Buffer.from(JSON.stringify({ exp: 9999999999 }), 'utf8')
-      .toString('base64')
+    const fakePayload = btoa(JSON.stringify({ exp: 9999999999 }))
       .replace(/\+/g, '-')
       .replace(/\//g, '_')
       .replace(/=+$/, '');
-    const result = verifySession(`${fakePayload}.${sig}`);
+    const result = await verifySession(`${fakePayload}.${sig}`);
     expect(result.ok).toBe(false);
   });
 
-  it('rejects an expired cookie', () => {
-    const cookie = signSession({ ttlSeconds: -10 });
-    const result = verifySession(cookie);
+  it('rejects an expired cookie', async () => {
+    const cookie = await signSession({ ttlSeconds: -10 });
+    const result = await verifySession(cookie);
     expect(result.ok).toBe(false);
   });
 
-  it('rejects malformed input', () => {
-    expect(verifySession('').ok).toBe(false);
-    expect(verifySession('no-dot').ok).toBe(false);
+  it('rejects malformed input', async () => {
+    expect((await verifySession('')).ok).toBe(false);
+    expect((await verifySession('no-dot')).ok).toBe(false);
   });
 
-  it('throws if AUTH_SECRET is not set', () => {
+  it('throws if AUTH_SECRET is not set', async () => {
     delete process.env.AUTH_SECRET;
-    expect(() => signSession({ ttlSeconds: 60 })).toThrow('AUTH_SECRET is required');
+    await expect(signSession({ ttlSeconds: 60 })).rejects.toThrow('AUTH_SECRET is required');
   });
 
-  it('throws if AUTH_SECRET is shorter than 32 chars', () => {
+  it('throws if AUTH_SECRET is shorter than 32 chars', async () => {
     process.env.AUTH_SECRET = 'too-short';
-    expect(() => signSession({ ttlSeconds: 60 })).toThrow('at least 32 characters');
+    await expect(signSession({ ttlSeconds: 60 })).rejects.toThrow('at least 32 characters');
   });
 });
