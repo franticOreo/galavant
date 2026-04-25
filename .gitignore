@@ -12,6 +12,8 @@ node_modules/
 out/
 build/
 dist/
+next-env.d.ts
+*.tsbuildinfo
 
 # Editor & OS
 .DS_Store
