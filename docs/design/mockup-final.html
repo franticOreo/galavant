@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Galavant — Design Source of Truth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Caveat:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Sky palette — Air-faithful daytime */
+    --sky-deep: #5a7da3;
+    --sky-mid:  #93b3d2;
+    --sky-pale: #c5d6e7;
+    --sky-haze: #e2e8ec;
+
+    /* Accents */
+    --neon-coral:      #ff7a9e;
+    --neon-coral-glow: rgba(255, 122, 158, 0.65);
+    --soft-coral:      #ffc1cf;
+
+    /* Ink (used inside light glass like user msg + composer text) */
+    --ink:      #1a2540;
+    --ink-soft: rgba(26, 37, 64, 0.78);
+
+    /* Glass tokens */
+    --glass-user-bg:        rgba(255, 255, 255, 0.60);
+    --glass-assistant-bg:   rgba(255, 255, 255, 0.32);
+    --glass-composer-bg:    rgba(255, 255, 255, 0.72);
+    --glass-chip-bg:        rgba(255, 255, 255, 0.20);
+    --glass-border:         rgba(255, 255, 255, 0.50);
+    --glass-border-strong:  rgba(255, 255, 255, 0.85);
+    --glass-blur:           28px;
+    --glass-blur-msg:       24px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: #0a0e1a;
+    color: white;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .stage-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; color: #6b7a90;
+    padding: 32px 40px 12px; background: #0a0e1a;
+  }
+
+  .viewport {
+    position: relative; width: 100%; height: 760px;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .sky {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 50% 35% at 70% 28%, rgba(255,255,255,0.85) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 22% at 78% 18%, rgba(255,255,255,0.6) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 28% at 18% 35%, rgba(255,255,255,0.5) 0%, transparent 65%),
+      radial-gradient(ellipse 30% 20% at 90% 50%, rgba(255,255,255,0.35) 0%, transparent 60%),
+      linear-gradient(180deg,
+        var(--sky-deep) 0%,
+        var(--sky-mid)  28%,
+        var(--sky-pale) 65%,
+        var(--sky-haze) 100%);
+  }
+
+  .vignette {
+    position: absolute; top: 0; left: 0; right: 0; height: 120px;
+    background: linear-gradient(180deg, rgba(15,25,45,0.45) 0%, transparent 100%);
+    z-index: 1; pointer-events: none;
+  }
+
+  .frame {
+    position: relative; z-index: 3;
+    height: 100%; max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 24px 24px;
+    display: flex; flex-direction: column;
+  }
+
+  .header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 24px;
+  }
+  .logo {
+    font-family: 'Anton', Impact, sans-serif;
+    font-size: 20px; letter-spacing: 2.5px;
+    color: white;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  }
+  .header-actions { display: flex; gap: 8px; }
+  .header-btn {
+    padding: 7px 14px; border-radius: 999px;
+    background: var(--glass-chip-bg);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.40);
+    color: white; font-size: 12px; font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    flex: 1;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    text-align: center; padding-bottom: 100px;
+  }
+  .wordmark {
+    font-family: 'Anton', Impact, sans-serif;
+    font-size: 124px; line-height: 0.92; letter-spacing: 4px;
+    color: white;
+    text-shadow:
+      0 2px 18px rgba(0,0,0,0.22),
+      0 0 60px rgba(255,255,255,0.12);
+  }
+  .tagline {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 44px;
+    margin-top: -4px;
+    transform: rotate(-4deg);
+    color: var(--neon-coral);
+    text-shadow:
+      0 0 6px var(--neon-coral-glow),
+      0 0 14px rgba(255,122,158,0.4);
+  }
+  .empty-hint {
+    margin-top: 28px;
+    color: rgba(255,255,255,0.78);
+    font-size: 13px; font-weight: 400; letter-spacing: 0.2px;
+  }
+  .suggestions {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    justify-content: center; margin-top: 18px;
+  }
+  .suggestion {
+    padding: 8px 14px; border-radius: 999px;
+    background: var(--glass-chip-bg);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.35);
+    color: white; font-size: 12px; font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* CONVERSATION */
+  .messages {
+    flex: 1; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 14px;
+    padding: 8px 4px 100px;
+  }
+  .messages::-webkit-scrollbar { width: 0; }
+
+  .msg {
+    max-width: 78%;
+    padding: 12px 18px; border-radius: 22px;
+    backdrop-filter: blur(var(--glass-blur-msg));
+    -webkit-backdrop-filter: blur(var(--glass-blur-msg));
+    font-size: 14px; line-height: 1.55;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 2px 18px rgba(20,30,50,0.06);
+  }
+  .msg.user {
+    align-self: flex-end;
+    background: var(--glass-user-bg);
+    color: var(--ink);
+    border-bottom-right-radius: 8px;
+  }
+  .msg.assistant {
+    align-self: flex-start;
+    background: var(--glass-assistant-bg);
+    color: white;
+    border-bottom-left-radius: 8px;
+    border-color: rgba(255,255,255,0.45);
+  }
+  .msg.assistant strong { color: white; font-weight: 600; }
+  .msg.assistant a {
+    color: var(--soft-coral);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255,193,207,0.55);
+  }
+  .msg.assistant ul { padding-left: 18px; margin: 8px 0; }
+  .msg.assistant li { margin: 4px 0; }
+  .msg.assistant p + p { margin-top: 8px; }
+
+  .streaming-cursor {
+    display: inline-block;
+    width: 8px; height: 16px;
+    background: var(--neon-coral);
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    box-shadow: 0 0 8px var(--neon-coral-glow);
+    animation: blink 1s steps(2) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .msg.assistant.streaming {
+    box-shadow:
+      0 2px 18px rgba(20,30,50,0.06),
+      0 0 0 1px rgba(255,193,207,0.35),
+      0 0 24px rgba(255,193,207,0.18);
+  }
+
+  /* COMPOSER */
+  .composer-wrap {
+    position: absolute; bottom: 24px; left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 48px); max-width: 672px;
+    z-index: 4;
+  }
+  .composer {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px 10px 22px;
+    border-radius: 999px;
+    background: var(--glass-composer-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border-strong);
+    box-shadow: 0 8px 30px rgba(20,30,50,0.08), 0 2px 6px rgba(20,30,50,0.04);
+  }
+  .composer input {
+    flex: 1; border: none; background: transparent;
+    color: var(--ink); font-family: inherit;
+    font-size: 15px; outline: none; padding: 8px 0;
+  }
+  .composer input::placeholder { color: rgba(26,37,64,0.45); }
+  .composer .send {
+    width: 38px; height: 38px; border-radius: 50%;
+    border: none; background: var(--ink); color: white;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0;
+    transition: transform 0.12s;
+  }
+  .composer .send:hover { transform: scale(1.05); }
+</style>
+</head>
+<body>
+
+<!-- ============ EMPTY STATE ============ -->
+<div class="stage-label">01 — Empty state · entry moment</div>
+<div class="viewport">
+  <div class="sky"></div>
+  <div class="vignette"></div>
+  <div class="frame">
+    <div class="header">
+      <div class="logo">GALAVANT</div>
+      <div class="header-actions">
+        <button class="header-btn">Sign in</button>
+      </div>
+    </div>
+
+    <div class="empty-state">
+      <div class="wordmark">GALAVANT</div>
+      <div class="tagline">travel, lifted</div>
+      <div class="empty-hint">Plan your trip. Skip the booking-site shuffle.</div>
+      <div class="suggestions">
+        <button class="suggestion">2 weeks in Japan, under $3k</button>
+        <button class="suggestion">Cheapest May flight NYC → Lisbon</button>
+        <button class="suggestion">Solo trip, beach + hiking, October</button>
+      </div>
+    </div>
+
+    <div class="composer-wrap">
+      <div class="composer">
+        <input placeholder="Where to?">
+        <button class="send">↑</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ACTIVE CONVERSATION ============ -->
+<div class="stage-label">02 — Active conversation · markdown + streaming</div>
+<div class="viewport">
+  <div class="sky"></div>
+  <div class="vignette"></div>
+  <div class="frame">
+    <div class="header">
+      <div class="logo">GALAVANT</div>
+      <div class="header-actions">
+        <button class="header-btn">New trip</button>
+        <button class="header-btn">Sign in</button>
+      </div>
+    </div>
+
+    <div class="messages">
+      <div class="msg user">
+        Tokyo for 2 weeks in May, under $1500 from NYC. Solo, flexible on dates.
+      </div>
+      <div class="msg assistant">
+        <p>Some honest framing — $1,500 NYC↔Tokyo round-trip in May is tight but doable.</p>
+        <ul>
+          <li><strong>Cheapest realistic window:</strong> depart Tue/Wed late-May, return mid-week. Avoid Memorial Day weekend.</li>
+          <li><strong>Routing:</strong> 1-stop via Seattle, Vancouver, or Toronto often beats nonstops by $200–400.</li>
+          <li><strong>Where to compare:</strong> <a href="#">Google Flights</a>, <a href="#">Skyscanner</a>, <a href="#">Kayak</a>.</li>
+        </ul>
+        <p>What's your departure flexibility — exact dates, or ±5 days?</p>
+      </div>
+      <div class="msg user">I can shift up to 5 days either way. Add a 3-day Kyoto leg?</div>
+      <div class="msg assistant streaming">
+        <p>Good — that opens up the cheap mid-week departures. For Kyoto, the move is to fly into Tokyo (HND or NRT), spend the front of the trip in Tokyo, then take the Shinkansen down<span class="streaming-cursor"></span></p>
+      </div>
+    </div>
+
+    <div class="composer-wrap">
+      <div class="composer">
+        <input value="What about food costs day-to-day?" placeholder="Where to?">
+        <button class="send">↑</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
