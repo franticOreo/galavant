@@ -1,8 +1,3 @@
-import {
-  ComposerAddAttachment,
-  ComposerAttachments,
-  UserMessageAttachments,
-} from "@/components/assistant-ui/attachment";
 import { MarkdownText } from "@/components/assistant-ui/markdown-text";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { Reasoning, ReasoningGroup } from "@/components/assistant-ui/reasoning";
@@ -16,7 +11,6 @@ import {
   ComposerPrimitive,
   ErrorPrimitive,
   MessagePrimitive,
-  SuggestionPrimitive,
   ThreadPrimitive,
   useAuiState,
 } from "@assistant-ui/react";
@@ -117,33 +111,31 @@ const ThreadWelcome: FC = () => {
           </p>
         </div>
       </div>
-      <ThreadSuggestions />
+      <ThreadStarterPrompts />
     </div>
   );
 };
 
-const ThreadSuggestions: FC = () => {
-  return (
-    <div className="aui-thread-welcome-suggestions grid w-full @md:grid-cols-2 gap-2 pb-4">
-      <ThreadPrimitive.Suggestions>
-        {() => <ThreadSuggestionItem />}
-      </ThreadPrimitive.Suggestions>
-    </div>
-  );
-};
+const STARTER_PROMPTS = [
+  "2 weeks in Japan, under $3k",
+  "Cheapest May flight NYC → Lisbon",
+  "Solo trip, beach + hiking, October",
+];
 
-const ThreadSuggestionItem: FC = () => {
+const ThreadStarterPrompts: FC = () => {
   return (
-    <div className="aui-thread-welcome-suggestion-display fade-in slide-in-from-bottom-2 @md:nth-[n+3]:block nth-[n+3]:hidden animate-in fill-mode-both duration-200">
-      <SuggestionPrimitive.Trigger send asChild>
-        <Button
-          variant="ghost"
-          className="aui-thread-welcome-suggestion h-11 min-h-11 w-full @md:flex-col flex-wrap items-center justify-center gap-1 rounded-full border border-white/40 bg-white/30 px-5 py-2 text-center text-[13px] font-medium text-white transition-colors hover:bg-white/40 hover:border-white/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-sky-mid"
+    <div className="fade-in slide-in-from-bottom-2 animate-in fill-mode-both delay-200 duration-300 flex w-full flex-wrap justify-center gap-2 px-4 pb-6">
+      {STARTER_PROMPTS.map((prompt) => (
+        <ThreadPrimitive.Suggestion
+          key={prompt}
+          prompt={prompt}
+          method="replace"
+          autoSend
+          className="min-h-11 rounded-full bg-white/30 px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-sky-mid"
         >
-          <SuggestionPrimitive.Title className="aui-thread-welcome-suggestion-text-1 font-medium" />
-          <SuggestionPrimitive.Description className="aui-thread-welcome-suggestion-text-2 text-white/60 empty:hidden" />
-        </Button>
-      </SuggestionPrimitive.Trigger>
+          {prompt}
+        </ThreadPrimitive.Suggestion>
+      ))}
     </div>
   );
 };
@@ -151,56 +143,46 @@ const ThreadSuggestionItem: FC = () => {
 const Composer: FC = () => {
   return (
     <ComposerPrimitive.Root className="aui-composer-root relative flex w-full flex-col">
-      <ComposerPrimitive.AttachmentDropzone asChild>
         <div
           data-slot="aui_composer-shell"
-          className="flex w-full flex-col gap-2 rounded-3xl border border-[var(--glass-border-strong)] bg-[var(--glass-composer)] backdrop-blur-2xl p-(--composer-padding) shadow-[0_8px_30px_rgba(20,30,50,0.08),0_2px_6px_rgba(20,30,50,0.04)] transition-shadow focus-within:ring-2 focus-within:ring-accent/40 data-[dragging=true]:border-accent data-[dragging=true]:border-dashed"
+          className="flex w-full items-end gap-2 rounded-full bg-[var(--glass-composer)] backdrop-blur-2xl px-4 py-2 shadow-[0_8px_30px_rgba(20,30,50,0.08),0_2px_6px_rgba(20,30,50,0.04)] transition-shadow focus-within:shadow-[0_8px_30px_rgba(20,30,50,0.10),0_0_0_1px_rgba(93,213,204,0.30)]"
         >
-          <ComposerAttachments />
           <ComposerPrimitive.Input
             placeholder="Where to?"
-            className="aui-composer-input max-h-32 min-h-11 w-full resize-none bg-transparent px-2.5 py-2 text-[15px] text-ink outline-none placeholder:text-[var(--ink-muted)]"
+            className="aui-composer-input flex-1 max-h-32 min-h-11 resize-none bg-transparent px-2 py-2.5 text-[15px] text-ink outline-none placeholder:text-[var(--ink-muted)]"
             rows={1}
             autoFocus
             aria-label="Message input"
           />
           <ComposerAction />
         </div>
-      </ComposerPrimitive.AttachmentDropzone>
     </ComposerPrimitive.Root>
   );
 };
 
 const ComposerAction: FC = () => {
   return (
-    <div className="aui-composer-action-wrapper relative flex items-center justify-between">
-      <ComposerAddAttachment />
+    <div className="aui-composer-action-wrapper flex items-center">
       <AuiIf condition={(s) => !s.thread.isRunning}>
         <ComposerPrimitive.Send asChild>
-          <TooltipIconButton
-            tooltip="Send message"
-            side="bottom"
+          <button
             type="button"
-            variant="default"
-            size="icon"
-            className="aui-composer-send size-11 rounded-full bg-ink text-white hover:bg-ink/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-white/72"
             aria-label="Send message"
+            className="aui-composer-send flex size-9 shrink-0 items-center justify-center rounded-full bg-ink text-white transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-white/72 disabled:opacity-40"
           >
-            <ArrowUpIcon className="aui-composer-send-icon size-4" />
-          </TooltipIconButton>
+            <ArrowUpIcon className="size-4" />
+          </button>
         </ComposerPrimitive.Send>
       </AuiIf>
       <AuiIf condition={(s) => s.thread.isRunning}>
         <ComposerPrimitive.Cancel asChild>
-          <Button
+          <button
             type="button"
-            variant="default"
-            size="icon"
-            className="aui-composer-cancel size-8 rounded-full"
             aria-label="Stop generating"
+            className="aui-composer-cancel flex size-9 shrink-0 items-center justify-center rounded-full bg-ink text-white"
           >
-            <SquareIcon className="aui-composer-cancel-icon size-3 fill-current" />
-          </Button>
+            <SquareIcon className="size-3 fill-current" />
+          </button>
         </ComposerPrimitive.Cancel>
       </AuiIf>
     </div>
@@ -311,8 +293,6 @@ const UserMessage: FC = () => {
       className="fade-in slide-in-from-bottom-1 grid animate-in auto-rows-auto grid-cols-[minmax(72px,1fr)_auto] content-start gap-y-2 px-2 duration-150 [&:where(>*)]:col-start-2"
       data-role="user"
     >
-      <UserMessageAttachments />
-
       <div className="aui-user-message-content-wrapper relative col-start-2 min-w-0">
         <div className="aui-user-message-content wrap-break-word peer rounded-3xl rounded-br-lg bg-ink/92 backdrop-blur-md px-5 py-3 text-[15px] leading-[1.5] tracking-[-0.005em] text-white shadow-[0_1px_12px_rgba(20,30,50,0.10)] empty:hidden">
           <MessagePrimitive.Parts />
