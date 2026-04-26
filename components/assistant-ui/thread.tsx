@@ -26,6 +26,8 @@ import {
   PencilIcon,
   RefreshCwIcon,
   SquareIcon,
+  ThumbsDownIcon,
+  ThumbsUpIcon,
 } from "lucide-react";
 import type { FC } from "react";
 
@@ -192,11 +194,22 @@ const ComposerAction: FC = () => {
 const MessageError: FC = () => {
   return (
     <MessagePrimitive.Error>
-      <ErrorPrimitive.Root className="aui-message-error-root mt-3 flex items-start gap-2.5 rounded-2xl bg-[rgb(255_220_205_/_0.60)] backdrop-blur-md px-4 py-3 text-[13px] leading-[1.5] text-ink shadow-[inset_0_1px_0_rgb(255_255_255_/_0.45)]">
-        <span aria-hidden className="mt-0.5 inline-block size-1.5 shrink-0 rounded-full bg-[#c97842]" />
+      <ErrorPrimitive.Root className="aui-message-error-root self-start max-w-[88%] mt-1 flex items-start gap-3 rounded-tl-[24px] rounded-tr-[28px] rounded-br-[18px] rounded-bl-[12px] bg-[radial-gradient(ellipse_at_18%_20%,rgb(255_232_215_/_0.85)_0%,rgb(255_220_205_/_0.55)_70%)] backdrop-blur-xl px-4 py-3 text-[14px] leading-[1.5] text-ink shadow-[inset_0_1px_0_rgb(255_255_255_/_0.55),0_2px_12px_rgb(180_100_50_/_0.10)]">
+        <span aria-hidden className="mt-1 inline-block size-2 shrink-0 rounded-full bg-warn" />
         <div className="flex-1 min-w-0">
-          <span className="font-medium">Couldn't reach the model.</span>{" "}
-          <ErrorPrimitive.Message className="aui-message-error-message text-ink/75" />
+          <span className="block font-semibold">Couldn't reach the model.</span>
+          <span className="mt-0.5 block text-ink/65 text-[13px]">
+            Something went wrong upstream. Try again, or rephrase your trip.
+          </span>
+          <ActionBarPrimitive.Reload asChild>
+            <button
+              type="button"
+              className="mt-2.5 inline-flex h-8 items-center gap-1.5 rounded-full bg-ink px-3 text-[12px] font-medium text-white transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            >
+              <RefreshCwIcon className="size-3" />
+              Try again
+            </button>
+          </ActionBarPrimitive.Reload>
         </div>
       </ErrorPrimitive.Root>
     </MessagePrimitive.Error>
@@ -218,7 +231,7 @@ const AssistantMessage: FC = () => {
     >
       <div
         data-slot="aui_assistant-message-content"
-        className="wrap-break-word self-start max-w-[88%] rounded-tl-[28px] rounded-tr-[36px] rounded-br-[22px] rounded-bl-[14px] bg-[radial-gradient(ellipse_at_22%_18%,rgb(255_255_255_/_0.65)_0%,rgb(255_255_255_/_0.42)_70%)] backdrop-blur-2xl px-5 py-4 text-[15px] leading-[1.6] tracking-[-0.005em] text-ink shadow-[inset_0_1px_0_rgb(255_255_255_/_0.55),inset_0_-1px_0_rgb(15_25_45_/_0.04),0_2px_8px_rgb(20_30_50_/_0.04),0_12px_32px_rgb(20_30_50_/_0.08)] [&_a]:text-accent-deep [&_a]:no-underline [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-accent-deep/40 [&_strong]:text-ink [&_strong]:font-semibold [&_ol]:my-2 [&_ul]:my-2 [&_li]:my-1 [&_p+p]:mt-3"
+        className="wrap-break-word self-start max-w-[88%] rounded-tl-[28px] rounded-tr-[36px] rounded-br-[22px] rounded-bl-[14px] bg-[radial-gradient(ellipse_at_22%_18%,rgb(255_255_255_/_0.65)_0%,rgb(255_255_255_/_0.42)_70%)] backdrop-blur-2xl px-5 py-4 text-[15px] leading-[1.6] tracking-[-0.005em] text-ink shadow-[inset_0_1px_0_rgb(255_255_255_/_0.55),inset_0_-1px_0_rgb(15_25_45_/_0.04),0_2px_8px_rgb(20_30_50_/_0.04),0_12px_32px_rgb(20_30_50_/_0.08)] [&_a]:text-accent-deep [&_a]:no-underline [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-accent-deep/40 [&_strong]:text-ink [&_strong]:font-semibold [&_ol]:my-2 [&_ul]:my-2 [&_li]:my-1 [&_p+p]:mt-3 empty:hidden"
       >
         <MessagePrimitive.Parts
           components={{
@@ -228,8 +241,9 @@ const AssistantMessage: FC = () => {
             tools: { Fallback: () => null },
           }}
         />
-        <MessageError />
       </div>
+
+      <MessageError />
 
       <div
         data-slot="aui_assistant-message-footer"
@@ -264,6 +278,16 @@ const AssistantActionBar: FC = () => {
           <RefreshCwIcon />
         </TooltipIconButton>
       </ActionBarPrimitive.Reload>
+      <ActionBarPrimitive.FeedbackPositive asChild>
+        <TooltipIconButton tooltip="Good response">
+          <ThumbsUpIcon />
+        </TooltipIconButton>
+      </ActionBarPrimitive.FeedbackPositive>
+      <ActionBarPrimitive.FeedbackNegative asChild>
+        <TooltipIconButton tooltip="Bad response">
+          <ThumbsDownIcon />
+        </TooltipIconButton>
+      </ActionBarPrimitive.FeedbackNegative>
       <ActionBarMorePrimitive.Root>
         <ActionBarMorePrimitive.Trigger asChild>
           <TooltipIconButton
@@ -336,7 +360,7 @@ const EditComposer: FC = () => {
       data-slot="aui_edit-composer-wrapper"
       className="flex flex-col px-2"
     >
-      <ComposerPrimitive.Root className="aui-edit-composer-root ms-auto flex w-full max-w-[88%] flex-col rounded-3xl bg-ink/92 backdrop-blur-md">
+      <ComposerPrimitive.Root className="aui-edit-composer-root ms-auto flex w-full max-w-[88%] flex-col rounded-tl-[32px] rounded-tr-[24px] rounded-br-[16px] rounded-bl-[28px] bg-ink shadow-[0_1px_12px_rgb(20_30_50_/_0.10)]">
         <ComposerPrimitive.Input
           className="aui-edit-composer-input min-h-14 w-full resize-none bg-transparent p-4 text-[15px] text-white outline-none placeholder:text-white/45"
           autoFocus

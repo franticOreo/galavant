@@ -3,6 +3,25 @@
 import { AssistantRuntimeProvider, useAssistantRuntime, useAuiState } from '@assistant-ui/react';
 import { useChatRuntime, AssistantChatTransport } from '@assistant-ui/react-ai-sdk';
 import { Thread } from '@/components/assistant-ui/thread';
+import { useMemo } from 'react';
+
+function getOrCreateSessionId(): string {
+  if (typeof window === 'undefined') return 'ssr';
+  const KEY = 'galavant-session';
+  const existing = sessionStorage.getItem(KEY);
+  if (existing) return existing;
+  const id = `sess-${Math.random().toString(36).slice(2, 10)}-${Date.now()}`;
+  sessionStorage.setItem(KEY, id);
+  return id;
+}
+
+function postFeedback(args: { sessionId: string; ts: number; rating: 'up' | 'down' }) {
+  fetch('/api/feedback', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(args),
+  }).catch((e) => console.warn('[feedback] post failed:', e));
+}
 
 function HeaderActions() {
   const runtime = useAssistantRuntime();
@@ -22,8 +41,20 @@ function HeaderActions() {
 }
 
 export default function Home() {
+  const sessionId = useMemo(() => getOrCreateSessionId(), []);
+
   const runtime = useChatRuntime({
-    transport: new AssistantChatTransport({ api: '/api/chat' }),
+    transport: new AssistantChatTransport({
+      api: '/api/chat',
+      headers: { 'x-galavant-session': sessionId },
+    }),
+    adapters: {
+      feedback: {
+        submit: ({ type }) => {
+          postFeedback({ sessionId, ts: Date.now(), rating: type === 'positive' ? 'up' : 'down' });
+        },
+      },
+    },
   });
 
   return (
