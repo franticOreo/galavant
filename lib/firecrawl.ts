@@ -7,6 +7,22 @@ export type ScrapeResult = ScrapeOk | ScrapeErr;
 
 type ScrapeArgs = { url: string; waitFor: number };
 
+// Derive a sensible Firecrawl location from a URL's TLD. Sites that geo-restrict
+// (e.g. skyscanner.com.au) need requests from a matching country to bypass blocks.
+export function locationFromUrl(url: string): string {
+  try {
+    const host = new URL(url).hostname;
+    if (host.endsWith('.com.au') || host.endsWith('.au')) return 'AU';
+    if (host.endsWith('.co.uk') || host.endsWith('.uk')) return 'GB';
+    if (host.endsWith('.de')) return 'DE';
+    if (host.endsWith('.fr')) return 'FR';
+    if (host.endsWith('.jp')) return 'JP';
+    return 'US';
+  } catch {
+    return 'US';
+  }
+}
+
 export async function firecrawlScrape({ url, waitFor }: ScrapeArgs): Promise<ScrapeResult> {
   const key = process.env.FIRECRAWL_API_KEY;
   if (!key) return { ok: false, error: 'FIRECRAWL_API_KEY not set' };
@@ -17,7 +33,17 @@ export async function firecrawlScrape({ url, waitFor }: ScrapeArgs): Promise<Scr
       Authorization: `Bearer ${key}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ url, formats: ['markdown'], waitFor, onlyMainContent: false }),
+    body: JSON.stringify({
+      url,
+      formats: ['markdown'],
+      waitFor,
+      onlyMainContent: false,
+      // Auto-escalate to enhanced (residential) proxies when basic gets blocked.
+      // Costs 5 credits per escalated request (~$0.005) vs 1 for basic.
+      proxy: 'auto',
+      // Match the site's country to bypass geo-blocks (Skyscanner AU was failing from US IPs).
+      location: { country: locationFromUrl(url) },
+    }),
     signal: AbortSignal.timeout(60_000),
   });
 

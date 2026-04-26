@@ -14,7 +14,7 @@ afterEach(() => {
 });
 
 describe('firecrawlScrape', () => {
-  it('sends correct auth header and body', async () => {
+  it('sends correct auth header, body shape, proxy:auto, and US location for .com', async () => {
     fetchMock.mockResolvedValueOnce(
       new Response(JSON.stringify({ data: { markdown: 'pre $123 mid $456 post' } }), { status: 200 }),
     );
@@ -32,7 +32,19 @@ describe('firecrawlScrape', () => {
       formats: ['markdown'],
       waitFor: 5000,
       onlyMainContent: false,
+      proxy: 'auto',
+      location: { country: 'US' },
     });
+  });
+
+  it('uses AU country for .com.au URLs (Skyscanner geo-block fix)', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ data: { markdown: '$1' } }), { status: 200 }),
+    );
+    await firecrawlScrape({ url: 'https://www.skyscanner.com.au/transport/flights/syd/dps/', waitFor: 1000 });
+    const body = JSON.parse((fetchMock.mock.calls[0][1] as RequestInit).body as string);
+    expect(body.location.country).toBe('AU');
+    expect(body.proxy).toBe('auto');
   });
 
   it('keeps the price-bearing region and includes pre-context', async () => {
