@@ -104,7 +104,7 @@ const ThreadWelcome: FC = () => {
       <div className="aui-thread-welcome-center flex w-full grow flex-col items-center justify-center pb-12">
         <div className="aui-thread-welcome-message flex flex-col items-center text-center px-4">
           <h1
-            className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both font-wordmark text-[80px] leading-[0.95] text-white duration-300 [text-shadow:0_2px_14px_rgb(0_0_0_/_0.22),0_0_50px_rgb(255_255_255_/_0.12)]"
+            className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both font-wordmark text-[64px] leading-[0.95] text-white duration-300 [text-shadow:0_2px_14px_rgb(0_0_0_/_0.22),0_0_50px_rgb(255_255_255_/_0.12)]"
           >
             Galavant
           </h1>

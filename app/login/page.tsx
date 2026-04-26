@@ -26,13 +26,13 @@ export default function LoginPage() {
     <main className="relative z-10 min-h-dvh flex items-center justify-center p-6">
       <form
         onSubmit={submit}
-        className="w-full max-w-sm flex flex-col items-center gap-5 rounded-3xl border border-white/50 bg-white/32 p-8 backdrop-blur-2xl shadow-[0_8px_30px_rgba(20,30,50,0.08)]"
+        className="w-full max-w-md flex flex-col items-center gap-5 rounded-3xl border border-white/50 bg-white/32 p-8 backdrop-blur-2xl shadow-[0_8px_30px_rgba(20,30,50,0.08)]"
       >
         <div className="flex flex-col items-center text-center">
-          <h1 className="font-wordmark text-[56px] leading-[0.95] text-white [text-shadow:0_2px_14px_rgb(0_0_0_/_0.22)]">
+          <h1 className="font-wordmark text-[44px] leading-[0.95] text-white [text-shadow:0_2px_14px_rgb(0_0_0_/_0.22)]">
             Galavant
           </h1>
-          <p className="font-script text-[24px] font-bold text-[#ff7a9e] -rotate-[4deg] -mt-1 [text-shadow:0_0_6px_rgb(255_122_158_/_0.65)]">
+          <p className="font-script text-[22px] font-bold text-[#ff7a9e] -rotate-[4deg] -mt-1 [text-shadow:0_0_6px_rgb(255_122_158_/_0.65)]">
             travel, lifted
           </p>
         </div>
