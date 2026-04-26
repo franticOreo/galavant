@@ -1,6 +1,6 @@
 # Galavant
 
-> Even the comparison sites have an angle. Skyscanner's #1 result and Kayak's #1 result are rarely the same flight, and neither is sorted purely on what's best for you. Galavant runs them in parallel and shows you what they disagree about.
+> A travel agent that's brutally analytical in the back, warm and opinionated in the front. Tell it about a trip, get a plan — flights, hotels, the whole thing — without having to open eight tabs and trust whichever aggregator's homepage you landed on.
 
 Live: https://galavant.vercel.app · Spec: [docs/superpowers/specs/2026-04-25-galavant-v1-design.md](docs/superpowers/specs/2026-04-25-galavant-v1-design.md)
 
@@ -12,11 +12,15 @@ Then I tried to plan a last-minute Japan trip with my partner — so much back a
 
 An agent should be doing that exhausting work.
 
-## What it does (v1)
+## What it feels like
 
-You type your trip in plain English. Galavant scrapes Kayak, Skyscanner, and Google Flights in parallel, ranks the options, and gives you deep links to click through and book. It never handles payment or credentials — you transact yourself.
+You talk to it like you'd talk to a travel agent. *"We're thinking Madrid in May for a long weekend, two of us, want to keep it under $2k all-in."* It comes back with a recommendation: a specific flight pairing, a neighborhood to stay in, a few hotel options, what to watch out for. Not a wall of search results. A plan.
 
-That's the whole product right now. No accounts, no saved searches, no group features. Just: type, wait ~30s, get ranked options.
+## What it actually does (v1)
+
+Behind the curtain: scrapes flight aggregators (Kayak, Skyscanner, Google Flights) in parallel for any flight question and surfaces what they disagree about. For everything else (hotels, cruises, ground transport, "should we stay in Centro or Salamanca?") it scrapes whatever travel site makes sense for the question, and falls back to general travel knowledge when scraping isn't useful.
+
+It never handles payment or credentials — you click through the deep links and transact yourself. No accounts, no saved searches, no group features.
 
 ## Who it's for
 
@@ -26,9 +30,13 @@ Not for: people doing simple one-leg trips on a single airline they already know
 
 ## What it's NOT
 
-(Stay out of scope until the wedge proves itself.)
+A clarification, since the agent and the *built infrastructure* are different things:
 
-- Hotels, multi-segment itinerary stitching, ground transport
+**The agent will help with anything travel-shaped** — flights, hotels, cruises, neighborhoods, day trips. It uses general knowledge plus its ability to scrape any URL.
+
+**Dedicated infrastructure is flight-only for v1.** Hotels and cruises are handled conversationally + opportunistically — not yet with the same rigor as flights (3 sites in parallel, ranked, deep-linked). Adding dedicated hotel/cruise infrastructure happens after the flight wedge proves itself.
+
+**Hard never-dos:**
 - Booking, payment, credential handling
 - User accounts, saved trips, sharing, group decisions
 - Form prefill past the search-results page (that's Phase 2)
