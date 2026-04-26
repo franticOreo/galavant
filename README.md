@@ -1,77 +1,63 @@
-# Travel Planning Agent — Project Brief
+# Galavant
 
-# Brand Name
-Galavant, potential domain, galavant.global.
+> Even the comparison sites have an angle. Skyscanner's #1 result and Kayak's #1 result are rarely the same flight, and neither is sorted purely on what's best for you. Galavant runs them in parallel and shows you what they disagree about.
 
-## Problem
+Live: https://galavant.vercel.app · Spec: [docs/superpowers/specs/2026-04-25-galavant-v1-design.md](docs/superpowers/specs/2026-04-25-galavant-v1-design.md)
 
-Travel booking is fragmented and opaque. Cheaper prices exist across platforms but are buried behind comparison friction. Consumers overpay because shopping properly across Booking.com, Skyscanner, Google Flights, Kayak, etc. is tedious. Booking platforms function as a "lazy layer" — convenient but rarely surfacing the genuinely cheapest path.
+## Why this exists
 
-We're removing that lazy tax.
+I missed an 11am flight to Ibiza because Google Flights didn't show it. Skyscanner had it the whole time. The aggregators don't see each other.
 
-## Solution
+Then I tried to plan a last-minute Japan trip with my partner — so much back and forth, so many tabs, so many comparisons. Eventually you give up and book whatever's cheapest on the front page of one site. That's the **lazy tax**: trips are complex enough that no human will exhaustively search, so people pay a premium for the convenience of not searching.
 
-A conversational agent that does the legwork. User describes their trip in natural language. Agent researches across booking sites in parallel, compares options across price/duration/layovers/constraints, and returns a ranked, mobile-friendly list of pre-filled booking links. User clicks through and pays themselves — agent never handles payment or credentials.
+An agent should be doing that exhausting work.
 
-# Development Philosophy
-* IMPORTANT:This ideally should be completely managed by agents. This is project created by one human, so we need this to be as simple, robust and easily maintable or even auto maintained by agents.
-* Speed to failure, let's get this project working in the next hour. there is no reason with opus 4.7 (superpowers plugin {paralell agents}) thats we can't do this.
+## What it does (v1)
 
+You type your trip in plain English. Galavant scrapes Kayak, Skyscanner, and Google Flights in parallel, ranks the options, and gives you deep links to click through and book. It never handles payment or credentials — you transact yourself.
 
-# Development Phases
+That's the whole product right now. No accounts, no saved searches, no group features. Just: type, wait ~30s, get ranked options.
 
-## Phase 1
-let's just find the best prices for a suggested itinerary.
+## Who it's for
 
-## Phase 2 
-prefill forms.
+Right now, a beachhead of 5 specific people: me, my partner, my dad, and Ash + Angus (we're planning a Spain trip). The wedge is "would Ash use it twice for the Spain planning instead of opening four tabs in Skyscanner?" Once 5 people each search twice, we'll know whether the lazy-tax thesis holds.
 
-## Scope (v1)
+Not for: people doing simple one-leg trips on a single airline they already know. Galavant earns its keep when the trip is complex enough to make manual comparison painful.
 
-- **Interface:** minimal chat wrapper. No forms.
-- **Input:** free-text trip description (origin, destination, dates, constraints, preferences).
-- **Output:** mobile-friendly ranked list of options with pre-filled deep links to each booking site, stopping just before the payment gateway.
-- **No booking execution.** No credential handling. Agent surfaces options; user transacts.
+## What it's NOT
 
-## Architecture
+(Stay out of scope until the wedge proves itself.)
 
-- **Primary scraper:** Firecrawl. Faster, cleaner, lower overhead.
-- **Fallback:** computer use, only when Firecrawl can't handle a specific site (anti-scraping, dynamic JS, etc.).
-- **Parallel execution:** run searches across multiple sites concurrently.
-- **Agent harness:** Open Claw (with Kimi 2.6)
-- **Cloud** AWS account for eli.simic.robertson@gmail.com, small ec2 instance. 
-- Keep it simple. Side project. Maintainability > cleverness.
+- Hotels, multi-segment itinerary stitching, ground transport
+- Booking, payment, credential handling
+- User accounts, saved trips, sharing, group decisions
+- Form prefill past the search-results page (that's Phase 2)
+- Native mobile app, PWA, offline support
+- Loyalty point optimisation
 
-## Target sites (initial)
-Booking.com, Skyscanner, Google Flights, Kayak, Expedia. Expand based on coverage gaps.
+## How it stays alive
 
-## Out of scope (for now)
+Galavant is built to be **self-maintaining**:
 
-- Actual booking / payment flow
-- Multi-tenant credential management (interesting problem, deferred — see "Future")
-- Loyalty point optimization
-- Hotel + flight bundling logic beyond surfacing what sites already offer
+- **Daily smoke test** — a remote agent hits the live URL with a real flight query at 09:00 Sydney; if it's broken, opens a GitHub issue tagged `@claude` which auto-opens a fix PR which auto-merges when CI passes
+- **Weekly retro** (Sundays) — a remote agent posts a one-screen summary of what shipped + what's worth doing
+- **Monthly security audit** (1st of month) — a remote agent runs an OWASP/secret/dependency review
+- **Quarterly CEO review** (Jan/Apr/Jul/Oct) — a remote agent posts ONE strategic question for me to answer: SCALE / FOCUS / PIVOT / SUNSET
+- **Dependabot** — weekly grouped npm + GH Actions update PRs, auto-merged when CI green
 
-## Future / open questions
+Touch-time target: read the quarterly review. Everything else handles itself.
 
-- **Public agent + secure credential passing:** explored conceptually (zero-knowledge proofs, scoped OAuth tokens, session isolation). Not v1. Real challenge is multi-tenant state isolation, not crypto.
-- **Business model:** affiliate links? Flat fee per trip plan? Subscription? Decide after validating the planning value.
-- **Learning layer:** captured price comparison patterns and itinerary nuances could become a reusable knowledge base across users.
+## Architecture (one paragraph)
 
-## Build order
+Single Next.js 16 app on Vercel. Vercel AI SDK v6 streams chat from Kimi K2 via OpenRouter. One generic `firecrawl(url)` tool — the model picks URLs from templates kept in `TRAVEL_SKILL.md`. No per-site code, no parsers, no DB. assistant-ui owns the chat surface. HMAC-signed cookie auth (Web Crypto, Edge-compatible). Vercel KV rate-limits per IP.
 
-1. Firecrawl integration against 2-3 target sites
-2. Parallel search orchestration
-3. Ranking + comparison logic
-4. Pre-filled deep-link generation
-5. Chat wrapper UI
-6. Fallback to computer use for sites that block Firecrawl
+Full architecture: [docs/superpowers/specs/2026-04-25-galavant-v1-design.md](docs/superpowers/specs/2026-04-25-galavant-v1-design.md). For AI agents working on the codebase: [CLAUDE.md](CLAUDE.md).
 
 ## Run locally
 
 ```bash
 cp .env.example .env.local
-# fill in FIRECRAWL_API_KEY, GROQ_API_KEY, APP_PASSWORD (>=8 chars), AUTH_SECRET (>=32 chars)
+# fill in FIRECRAWL_API_KEY, OPENROUTER_API_KEY, APP_PASSWORD, AUTH_SECRET (>=32 chars)
 npm install
 npm run dev
 ```
@@ -84,6 +70,12 @@ Open `http://localhost:3000`, log in with `APP_PASSWORD`, ask for a flight.
 npm test
 ```
 
-## Deploy
+## Cost ceiling
 
-See `docs/superpowers/specs/2026-04-25-galavant-v1-design.md` § Deploy.
+Side project budget: ~$10-40/month. Vercel free + Firecrawl ~$5-30 + OpenRouter ~$1-10. If a change would 10x this, it gets discussed first.
+
+## Status
+
+v1 shipped 2026-04-26. Single user (me) + friends with the password. Pre-demand by definition — I built it yesterday. The Ibiza miss is the only proof yet that the lazy tax is real, and I'm the only person who's experienced it through Galavant.
+
+Whether this scales beyond a friends-with-password tool depends entirely on whether the 5 named people in "Who it's for" actually use it twice for real trips. If they don't, FOCUS or SUNSET in Q3 2026.
