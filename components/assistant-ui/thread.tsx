@@ -109,7 +109,7 @@ const ThreadWelcome: FC = () => {
             Galavant
           </h1>
           <p
-            className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both font-script text-[32px] font-bold text-[#ff7a9e] -rotate-[4deg] -mt-1 delay-100 duration-300 [text-shadow:0_0_6px_rgb(255_122_158_/_0.65),0_0_14px_rgb(255_122_158_/_0.4)]"
+            className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both font-script text-[32px] font-bold text-[#f4f6fa] -rotate-[3deg] -mt-1 delay-100 duration-300 [text-shadow:0_1px_3px_rgb(15_25_45_/_0.25)]"
           >
             travel, lifted
           </p>

@@ -32,7 +32,7 @@ export default function LoginPage() {
           <h1 className="font-wordmark text-[44px] leading-[0.95] text-white [text-shadow:0_2px_14px_rgb(0_0_0_/_0.22)]">
             Galavant
           </h1>
-          <p className="font-script text-[22px] font-bold text-[#ff7a9e] -rotate-[4deg] -mt-1 [text-shadow:0_0_6px_rgb(255_122_158_/_0.65)]">
+          <p className="font-script text-[22px] font-bold text-[#f4f6fa] -rotate-[3deg] -mt-1 [text-shadow:0_1px_3px_rgb(15_25_45_/_0.25)]">
             travel, lifted
           </p>
         </div>
