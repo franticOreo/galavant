@@ -4,7 +4,6 @@ import {
   UserMessageAttachments,
 } from "@/components/assistant-ui/attachment";
 import { MarkdownText } from "@/components/assistant-ui/markdown-text";
-import { ToolFallback } from "@/components/assistant-ui/tool-fallback";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { Reasoning, ReasoningGroup } from "@/components/assistant-ui/reasoning";
 import { Button } from "@/components/ui/button";
@@ -233,14 +232,14 @@ const AssistantMessage: FC = () => {
     >
       <div
         data-slot="aui_assistant-message-content"
-        className="wrap-break-word self-start max-w-[78%] rounded-3xl rounded-bl-md border border-[var(--glass-border)] bg-[var(--glass-assistant)] backdrop-blur-2xl px-4.5 py-3 text-[14px] leading-[1.55] text-ink shadow-[0_2px_18px_rgba(20,30,50,0.06)] [&_a]:text-accent-deep [&_a]:no-underline [&_a]:border-b [&_a]:border-accent-deep/55 [&_strong]:text-ink [&_strong]:font-semibold"
+        className="wrap-break-word self-start max-w-[88%] rounded-3xl rounded-bl-lg bg-white/55 backdrop-blur-xl px-5 py-4 text-[15px] leading-[1.6] tracking-[-0.005em] text-ink shadow-[0_1px_12px_rgba(20,30,50,0.05)] [&_a]:text-accent-deep [&_a]:no-underline [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-accent-deep/40 [&_strong]:text-ink [&_strong]:font-semibold [&_ol]:my-2 [&_ul]:my-2 [&_li]:my-1 [&_p+p]:mt-3"
       >
         <MessagePrimitive.Parts
           components={{
             Text: MarkdownText,
             Reasoning,
             ReasoningGroup,
-            tools: { Fallback: ToolFallback },
+            tools: { Fallback: () => null },
           }}
         />
         <MessageError />
@@ -315,7 +314,7 @@ const UserMessage: FC = () => {
       <UserMessageAttachments />
 
       <div className="aui-user-message-content-wrapper relative col-start-2 min-w-0">
-        <div className="aui-user-message-content wrap-break-word peer rounded-3xl rounded-br-md border border-[var(--glass-border)] bg-[var(--glass-user)] backdrop-blur-2xl px-4.5 py-3 text-[14px] leading-[1.55] text-ink shadow-[0_2px_18px_rgba(20,30,50,0.06)] empty:hidden">
+        <div className="aui-user-message-content wrap-break-word peer rounded-3xl rounded-br-lg bg-ink/92 backdrop-blur-md px-5 py-3 text-[15px] leading-[1.5] tracking-[-0.005em] text-white shadow-[0_1px_12px_rgba(20,30,50,0.10)] empty:hidden">
           <MessagePrimitive.Parts />
         </div>
         <div className="aui-user-action-bar-wrapper absolute start-0 top-1/2 -translate-x-full -translate-y-1/2 pe-2 peer-empty:hidden rtl:translate-x-full">
@@ -353,9 +352,9 @@ const EditComposer: FC = () => {
       data-slot="aui_edit-composer-wrapper"
       className="flex flex-col px-2"
     >
-      <ComposerPrimitive.Root className="aui-edit-composer-root ms-auto flex w-full max-w-[85%] flex-col rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-user)] backdrop-blur-2xl">
+      <ComposerPrimitive.Root className="aui-edit-composer-root ms-auto flex w-full max-w-[88%] flex-col rounded-3xl bg-ink/92 backdrop-blur-md">
         <ComposerPrimitive.Input
-          className="aui-edit-composer-input min-h-14 w-full resize-none bg-transparent p-4 text-[14px] text-ink outline-none"
+          className="aui-edit-composer-input min-h-14 w-full resize-none bg-transparent p-4 text-[15px] text-white outline-none placeholder:text-white/45"
           autoFocus
         />
         <div className="aui-edit-composer-footer mx-3 mb-3 flex items-center gap-2 self-end">
