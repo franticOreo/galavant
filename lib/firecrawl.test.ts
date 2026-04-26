@@ -29,7 +29,7 @@ describe('firecrawlScrape', () => {
     const body = JSON.parse((init as RequestInit).body as string);
     expect(body).toEqual({
       url: 'https://example.com/x',
-      formats: ['markdown'],
+      formats: ['markdown', 'links'],
       waitFor: 5000,
       onlyMainContent: false,
       proxy: 'auto',
@@ -103,5 +103,45 @@ describe('firecrawlScrape', () => {
     const r = await firecrawlScrape({ url: 'https://x.test', waitFor: 1000 });
     expect(r.ok).toBe(true);
     if (r.ok) expect(r.markdown).toBe('no prices here');
+  });
+
+  it('returns bookingLinks filtered from Firecrawl links format', async () => {
+    const allLinks = [
+      'https://www.kayak.com/book/flight?code=ABC&h=hash&sub=F123',
+      'https://www.kayak.com/flights/SYD-DPS/2026-08-10/2026-08-17',  // search page — drop
+      'https://www.skyscanner.com.au/transport/flights/syd/dps/260810/260817/config/16692-2608101625',
+      'https://img.example.com/logo.png',                              // asset — drop
+      'https://www.kayak.com/privacy',                                 // legal — drop
+      'https://kayak.com/?bucket=ECONOMY_&pageOrigin=H_FE_LP',         // not booking-intent — drop
+    ];
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ data: { markdown: '$612 Jetstar', links: allLinks } }), { status: 200 }),
+    );
+    const r = await firecrawlScrape({ url: 'https://www.kayak.com/flights/SYD-DPS/2026-08-10/2026-08-17', waitFor: 1000 });
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.bookingLinks).toEqual([
+        'https://www.kayak.com/book/flight?code=ABC&h=hash&sub=F123',
+        'https://www.skyscanner.com.au/transport/flights/syd/dps/260810/260817/config/16692-2608101625',
+      ]);
+    }
+  });
+
+  it('requests both markdown and links formats from Firecrawl', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ data: { markdown: '$1', links: [] } }), { status: 200 }),
+    );
+    await firecrawlScrape({ url: 'https://example.com', waitFor: 1000 });
+    const body = JSON.parse((fetchMock.mock.calls[0][1] as RequestInit).body as string);
+    expect(body.formats).toEqual(['markdown', 'links']);
+  });
+
+  it('returns empty bookingLinks when Firecrawl returns no links', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ data: { markdown: '$1' } }), { status: 200 }),
+    );
+    const r = await firecrawlScrape({ url: 'https://example.com', waitFor: 1000 });
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.bookingLinks).toEqual([]);
   });
 });

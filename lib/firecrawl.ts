@@ -1,7 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 
-type ScrapeOk = { ok: true; url: string; markdown: string };
+type ScrapeOk = { ok: true; url: string; markdown: string; bookingLinks: string[] };
 type ScrapeErr = { ok: false; error: string };
 export type ScrapeResult = ScrapeOk | ScrapeErr;
 
@@ -23,6 +23,15 @@ export function locationFromUrl(url: string): string {
   }
 }
 
+// Generic heuristic for "this URL is a per-flight booking link, not a nav/ad/legal/search page".
+// Applies across sites — no per-site code. Catches:
+//   /book/ (Kayak, Booking.com, etc.)
+//   /flight (most aggregators when the path mentions a specific flight)
+//   /config/ (Skyscanner per-itinerary)
+//   itinerary= or transport_deeplink (Skyscanner alternative paths)
+//   ?code= (Kayak query-param booking tokens)
+const BOOKING_INTENT = /\/book\/|\/flight[^s]|\/config\/|itinerary=|transport_deeplink|\?code=/i;
+
 export async function firecrawlScrape({ url, waitFor }: ScrapeArgs): Promise<ScrapeResult> {
   const key = process.env.FIRECRAWL_API_KEY;
   if (!key) return { ok: false, error: 'FIRECRAWL_API_KEY not set' };
@@ -35,7 +44,7 @@ export async function firecrawlScrape({ url, waitFor }: ScrapeArgs): Promise<Scr
     },
     body: JSON.stringify({
       url,
-      formats: ['markdown'],
+      formats: ['markdown', 'links'],
       waitFor,
       onlyMainContent: false,
       // Auto-escalate to enhanced (residential) proxies when basic gets blocked.
@@ -52,9 +61,11 @@ export async function firecrawlScrape({ url, waitFor }: ScrapeArgs): Promise<Scr
     return { ok: false, error: `Firecrawl ${res.status}: ${text.slice(0, 200)}` };
   }
 
-  const json = (await res.json()) as { data?: { markdown?: string } };
+  const json = (await res.json()) as { data?: { markdown?: string; links?: string[] } };
   const markdown = json?.data?.markdown ?? '';
-  return { ok: true, url, markdown: trimMarkdown(markdown) };
+  const allLinks = json?.data?.links ?? [];
+  const bookingLinks = Array.from(new Set(allLinks.filter((u) => BOOKING_INTENT.test(u))));
+  return { ok: true, url, markdown: trimMarkdown(markdown), bookingLinks };
 }
 
 // Hard cap of ~6KB per scrape to keep total tool output under model context budgets.
