@@ -16,7 +16,13 @@ export async function POST(req: Request): Promise<Response> {
     return new Response('bad json', { status: 400 });
   }
 
-  const uiMessages = Array.isArray(body.messages) ? (body.messages as UIMessage[]) : [];
+  const allMessages = Array.isArray(body.messages) ? (body.messages as UIMessage[]) : [];
+
+  // Cap context to the most recent N messages. Tool returns (Firecrawl markdown ~6KB each)
+  // accumulate across turns and blow through small prompt-token caps fast (e.g. OpenRouter
+  // free tier's 16k cap). Travel planning rarely needs more than the last few turns of context.
+  const HISTORY_CAP = 12;
+  const uiMessages = allMessages.slice(-HISTORY_CAP);
 
   // useChat / assistant-ui send UIMessage[] (parts-shaped); streamText needs ModelMessage[].
   // convertToModelMessages is async in ai v6 — must await before passing.
