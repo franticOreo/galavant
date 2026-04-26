@@ -20,8 +20,8 @@ vi.mock('ai', async () => {
   };
 });
 
-vi.mock('@ai-sdk/groq', () => ({
-  groq: () => ({ /* fake provider */ }),
+vi.mock('@openrouter/ai-sdk-provider', () => ({
+  createOpenRouter: () => () => ({ /* fake provider */ }),
 }));
 
 vi.mock('@/lib/prompt', () => ({
@@ -29,7 +29,7 @@ vi.mock('@/lib/prompt', () => ({
 }));
 
 beforeEach(() => {
-  process.env.GROQ_API_KEY = 'gsk-test';
+  process.env.OPENROUTER_API_KEY = 'sk-or-test';
 });
 
 import { POST } from './route';
