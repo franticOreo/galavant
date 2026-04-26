@@ -1,27 +1,74 @@
 @import "tailwindcss";
 @import "tw-shimmer";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Fonts */
+  --font-sans: var(--font-inter);
+  --font-wordmark: var(--font-bbh-bartle), Impact, sans-serif;
+  --font-script: var(--font-caveat), cursive;
+
+  /* Sky palette — Air-faithful daytime */
+  --color-sky-deep: #5a7da3;
+  --color-sky-mid:  #93b3d2;
+  --color-sky-pale: #c5d6e7;
+  --color-sky-haze: #e2e8ec;
+
+  /* Accents */
+  --color-neon-coral: #ff7a9e;
+  --color-soft-coral: #ffc1cf;
+  --color-ink:        #1a2540;
+
+  /* Glass */
+  --color-glass-user:      rgb(255 255 255 / 0.60);
+  --color-glass-assistant: rgb(255 255 255 / 0.32);
+  --color-glass-composer:  rgb(255 255 255 / 0.72);
+  --color-glass-chip:      rgb(255 255 255 / 0.20);
+  --color-glass-border:        rgb(255 255 255 / 0.50);
+  --color-glass-border-strong: rgb(255 255 255 / 0.85);
+
+  /* Tailwind shadcn-token shims so existing components inherit our system */
+  --color-background:  transparent;
+  --color-foreground:  #1a2540;
+  --color-muted:       rgb(255 255 255 / 0.60);
+  --color-muted-foreground: rgb(26 37 64 / 0.65);
+  --color-border:      rgb(255 255 255 / 0.45);
+  --color-ring:        #ff7a9e;
+  --color-accent:      rgb(255 255 255 / 0.30);
+  --color-accent-foreground: #1a2540;
+  --color-popover:     rgb(255 255 255 / 0.85);
+  --color-popover-foreground: #1a2540;
+  --color-destructive: #d04060;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Sky background — applied to body so every page inherits */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  background:
+    radial-gradient(ellipse 50% 35% at 70% 28%, rgb(255 255 255 / 0.85) 0%, transparent 60%),
+    radial-gradient(ellipse 35% 22% at 78% 18%, rgb(255 255 255 / 0.60) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 28% at 18% 35%, rgb(255 255 255 / 0.50) 0%, transparent 65%),
+    radial-gradient(ellipse 30% 20% at 90% 50%, rgb(255 255 255 / 0.35) 0%, transparent 60%),
+    linear-gradient(180deg,
+      var(--color-sky-deep) 0%,
+      var(--color-sky-mid)  28%,
+      var(--color-sky-pale) 65%,
+      var(--color-sky-haze) 100%);
+  background-attachment: fixed;
+  color: var(--color-foreground);
+}
+
+/* Dark vignette overlay — sits above the sky, below content */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 120px;
+  background: linear-gradient(180deg, rgb(15 25 45 / 0.45) 0%, transparent 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Streaming indicator shared keyframe */
+@keyframes coral-blink {
+  50% { opacity: 0; }
 }

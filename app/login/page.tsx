@@ -23,24 +23,34 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-dvh flex items-center justify-center p-6">
-      <form onSubmit={submit} className="w-full max-w-sm flex flex-col gap-3">
-        <h1 className="text-xl font-medium">Galavant</h1>
+    <main className="relative z-10 min-h-dvh flex items-center justify-center p-6">
+      <form
+        onSubmit={submit}
+        className="w-full max-w-sm flex flex-col items-center gap-5 rounded-3xl border border-white/50 bg-white/32 p-8 backdrop-blur-2xl shadow-[0_8px_30px_rgba(20,30,50,0.08)]"
+      >
+        <div className="flex flex-col items-center text-center">
+          <h1 className="font-wordmark text-[56px] leading-[0.95] text-white [text-shadow:0_2px_14px_rgb(0_0_0_/_0.22)]">
+            Galavant
+          </h1>
+          <p className="font-script text-[24px] font-bold text-[#ff7a9e] -rotate-[4deg] -mt-1 [text-shadow:0_0_6px_rgb(255_122_158_/_0.65)]">
+            travel, lifted
+          </p>
+        </div>
         <input
           type="password"
           autoFocus
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
-          className="border rounded-md p-3 bg-transparent"
+          className="w-full rounded-full border border-white/60 bg-white/72 px-5 py-3 text-[15px] text-[#1a2540] placeholder:text-[#1a2540]/45 backdrop-blur-xl outline-none focus:ring-2 focus:ring-[#ff7a9e]/30"
         />
         <button
           disabled={loading || !password}
-          className="rounded-md p-3 bg-black text-white disabled:opacity-50"
+          className="w-full rounded-full bg-[#1a2540] px-5 py-3 text-[15px] font-medium text-white transition-transform disabled:opacity-50 hover:not-disabled:scale-[1.02]"
         >
           {loading ? 'Checking…' : 'Enter'}
         </button>
-        {err && <p className="text-sm text-red-600">{err}</p>}
+        {err && <p className="text-sm text-red-200">{err}</p>}
       </form>
     </main>
   );

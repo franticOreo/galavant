@@ -39,10 +39,10 @@ import type { FC } from "react";
 export const Thread: FC = () => {
   return (
     <ThreadPrimitive.Root
-      className="aui-root aui-thread-root @container flex h-full flex-col bg-background"
+      className="aui-root aui-thread-root @container flex h-full flex-col"
       style={{
         ["--thread-max-width" as string]: "44rem",
-        ["--composer-radius" as string]: "24px",
+        ["--composer-radius" as string]: "9999px",
         ["--composer-padding" as string]: "10px",
       }}
     >
@@ -65,7 +65,7 @@ export const Thread: FC = () => {
             </ThreadPrimitive.Messages>
           </div>
 
-          <ThreadPrimitive.ViewportFooter className="aui-thread-viewport-footer sticky bottom-0 mt-auto flex flex-col gap-4 overflow-visible rounded-t-(--composer-radius) bg-background pb-4 md:pb-6">
+          <ThreadPrimitive.ViewportFooter className="aui-thread-viewport-footer sticky bottom-0 mt-auto flex flex-col gap-4 overflow-visible pb-4 md:pb-6">
             <ThreadScrollToBottom />
             <Composer />
           </ThreadPrimitive.ViewportFooter>
@@ -101,13 +101,20 @@ const ThreadScrollToBottom: FC = () => {
 const ThreadWelcome: FC = () => {
   return (
     <div className="aui-thread-welcome-root my-auto flex grow flex-col">
-      <div className="aui-thread-welcome-center flex w-full grow flex-col items-center justify-center">
-        <div className="aui-thread-welcome-message flex size-full flex-col justify-center px-4">
-          <h1 className="aui-thread-welcome-message-inner fade-in slide-in-from-bottom-1 animate-in fill-mode-both font-semibold text-2xl duration-200">
-            Hello there!
+      <div className="aui-thread-welcome-center flex w-full grow flex-col items-center justify-center pb-12">
+        <div className="aui-thread-welcome-message flex flex-col items-center text-center px-4">
+          <h1
+            className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both font-wordmark text-[80px] leading-[0.95] text-white duration-300 [text-shadow:0_2px_14px_rgb(0_0_0_/_0.22),0_0_50px_rgb(255_255_255_/_0.12)]"
+          >
+            Galavant
           </h1>
-          <p className="aui-thread-welcome-message-inner fade-in slide-in-from-bottom-1 animate-in fill-mode-both text-muted-foreground text-xl delay-75 duration-200">
-            How can I help you today?
+          <p
+            className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both font-script text-[32px] font-bold text-[#ff7a9e] -rotate-[4deg] -mt-1 delay-100 duration-300 [text-shadow:0_0_6px_rgb(255_122_158_/_0.65),0_0_14px_rgb(255_122_158_/_0.4)]"
+          >
+            travel, lifted
+          </p>
+          <p className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both mt-7 text-sm text-white/78 delay-150 duration-300">
+            Plan your trip. Skip the booking-site shuffle.
           </p>
         </div>
       </div>
@@ -132,10 +139,10 @@ const ThreadSuggestionItem: FC = () => {
       <SuggestionPrimitive.Trigger send asChild>
         <Button
           variant="ghost"
-          className="aui-thread-welcome-suggestion h-auto w-full @md:flex-col flex-wrap items-start justify-start gap-1 rounded-3xl border bg-background px-4 py-3 text-start text-sm transition-colors hover:bg-muted"
+          className="aui-thread-welcome-suggestion h-auto w-full @md:flex-col flex-wrap items-start justify-start gap-1 rounded-full border border-white/35 bg-white/20 px-4 py-2.5 text-start text-xs font-medium text-white backdrop-blur-xl transition-colors hover:bg-white/30 hover:border-white/45"
         >
           <SuggestionPrimitive.Title className="aui-thread-welcome-suggestion-text-1 font-medium" />
-          <SuggestionPrimitive.Description className="aui-thread-welcome-suggestion-text-2 text-muted-foreground empty:hidden" />
+          <SuggestionPrimitive.Description className="aui-thread-welcome-suggestion-text-2 text-white/60 empty:hidden" />
         </Button>
       </SuggestionPrimitive.Trigger>
     </div>
@@ -148,12 +155,12 @@ const Composer: FC = () => {
       <ComposerPrimitive.AttachmentDropzone asChild>
         <div
           data-slot="aui_composer-shell"
-          className="flex w-full flex-col gap-2 rounded-(--composer-radius) border bg-background p-(--composer-padding) transition-shadow focus-within:border-ring/75 focus-within:ring-2 focus-within:ring-ring/20 data-[dragging=true]:border-ring data-[dragging=true]:border-dashed data-[dragging=true]:bg-accent/50"
+          className="flex w-full flex-col gap-2 rounded-3xl border border-white/85 bg-white/72 backdrop-blur-2xl p-(--composer-padding) shadow-[0_8px_30px_rgba(20,30,50,0.08),0_2px_6px_rgba(20,30,50,0.04)] transition-shadow focus-within:ring-2 focus-within:ring-[#ff7a9e]/30 data-[dragging=true]:border-[#ff7a9e] data-[dragging=true]:border-dashed"
         >
           <ComposerAttachments />
           <ComposerPrimitive.Input
-            placeholder="Send a message..."
-            className="aui-composer-input max-h-32 min-h-10 w-full resize-none bg-transparent px-1.75 py-1 text-sm outline-none placeholder:text-muted-foreground/80"
+            placeholder="Where to?"
+            className="aui-composer-input max-h-32 min-h-10 w-full resize-none bg-transparent px-2.5 py-1 text-[15px] text-[#1a2540] outline-none placeholder:text-[#1a2540]/45"
             rows={1}
             autoFocus
             aria-label="Message input"
@@ -226,7 +233,7 @@ const AssistantMessage: FC = () => {
     >
       <div
         data-slot="aui_assistant-message-content"
-        className="wrap-break-word px-2 text-foreground leading-relaxed"
+        className="wrap-break-word self-start max-w-[78%] rounded-3xl rounded-bl-md border border-white/45 bg-white/32 backdrop-blur-2xl px-4.5 py-3 text-[14px] leading-[1.55] text-white shadow-[0_2px_18px_rgba(20,30,50,0.06)] [&_a]:text-[#ffc1cf] [&_a]:no-underline [&_a]:border-b [&_a]:border-[#ffc1cf]/55 [&_strong]:text-white [&_strong]:font-semibold"
       >
         <MessagePrimitive.Parts
           components={{
@@ -308,7 +315,7 @@ const UserMessage: FC = () => {
       <UserMessageAttachments />
 
       <div className="aui-user-message-content-wrapper relative col-start-2 min-w-0">
-        <div className="aui-user-message-content wrap-break-word peer rounded-2xl bg-muted px-4 py-2.5 text-foreground empty:hidden">
+        <div className="aui-user-message-content wrap-break-word peer rounded-3xl rounded-br-md border border-white/50 bg-white/60 backdrop-blur-2xl px-4.5 py-3 text-[14px] leading-[1.55] text-[#1a2540] shadow-[0_2px_18px_rgba(20,30,50,0.06)] empty:hidden">
           <MessagePrimitive.Parts />
         </div>
         <div className="aui-user-action-bar-wrapper absolute start-0 top-1/2 -translate-x-full -translate-y-1/2 pe-2 peer-empty:hidden rtl:translate-x-full">
@@ -346,9 +353,9 @@ const EditComposer: FC = () => {
       data-slot="aui_edit-composer-wrapper"
       className="flex flex-col px-2"
     >
-      <ComposerPrimitive.Root className="aui-edit-composer-root ms-auto flex w-full max-w-[85%] flex-col rounded-2xl bg-muted">
+      <ComposerPrimitive.Root className="aui-edit-composer-root ms-auto flex w-full max-w-[85%] flex-col rounded-3xl border border-white/50 bg-white/60 backdrop-blur-2xl">
         <ComposerPrimitive.Input
-          className="aui-edit-composer-input min-h-14 w-full resize-none bg-transparent p-4 text-foreground text-sm outline-none"
+          className="aui-edit-composer-input min-h-14 w-full resize-none bg-transparent p-4 text-[14px] text-[#1a2540] outline-none"
           autoFocus
         />
         <div className="aui-edit-composer-footer mx-3 mb-3 flex items-center gap-2 self-end">
