@@ -37,11 +37,29 @@
   --color-accent-bright: #6deedb;
   --color-accent-deep:   #1d6b6b;
 
-  /* shadcn-shim mapping for inherited components */
+  /* Warn (error leader, advisory) — burnt amber */
+  --color-warn:          #c97842;
+
+  /* shadcn shim — repainted to the sky/ink/glass palette so any inherited
+     shadcn components (action bar, popover, scroll-to-bottom, branch picker,
+     edit composer Buttons) render in the brand instead of stock neutral grays. */
   --color-background:        transparent;
   --color-foreground:        #1a2540;
   --color-ring:              #5dd5cc;
-  --color-destructive:       #d04060;
+  --color-destructive:       #b03455;
+  --color-muted:             rgb(255 255 255 / 0.40);
+  --color-muted-foreground:  rgb(26 37 64 / 0.55);
+  --color-border:            rgb(26 37 64 / 0.10);
+  --color-input:             rgb(26 37 64 / 0.10);
+  --color-popover:           rgb(255 255 255 / 0.85);
+  --color-popover-foreground: #1a2540;
+  --color-accent-foreground: #1a2540;
+  --color-primary:           #1a2540;
+  --color-primary-foreground: #ffffff;
+  --color-secondary:         rgb(255 255 255 / 0.40);
+  --color-secondary-foreground: #1a2540;
+  --color-card:              rgb(255 255 255 / 0.55);
+  --color-card-foreground:   #1a2540;
 }
 
 /* Sky background — applied to body so every page inherits */
@@ -79,6 +97,9 @@ body::before {
 }
 .cloud-breathe {
   animation: cloud-breathe 2.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cloud-breathe { animation: none; }
 }
 
 /* Visually-hidden utility for a11y labels */

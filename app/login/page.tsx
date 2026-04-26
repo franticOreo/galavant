@@ -54,7 +54,15 @@ export default function LoginPage() {
         >
           {loading ? 'Checking…' : 'Enter'}
         </button>
-        {err && <p className="text-sm text-red-200" role="alert">{err}</p>}
+        {err && (
+          <p
+            role="alert"
+            className="flex items-center gap-2 self-stretch rounded-full bg-[rgb(255_232_215_/_0.65)] backdrop-blur-md px-4 py-2 text-[13px] font-medium text-ink shadow-[inset_0_1px_0_rgb(255_255_255_/_0.45)]"
+          >
+            <span aria-hidden className="inline-block size-1.5 rounded-full bg-warn" />
+            {err}
+          </p>
+        )}
       </form>
     </main>
   );
