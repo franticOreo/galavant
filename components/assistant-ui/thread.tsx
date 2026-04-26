@@ -145,7 +145,7 @@ const Composer: FC = () => {
     <ComposerPrimitive.Root className="aui-composer-root relative flex w-full flex-col">
         <div
           data-slot="aui_composer-shell"
-          className="flex w-full items-end gap-2 rounded-full bg-[var(--glass-composer)] backdrop-blur-2xl px-4 py-2 shadow-[0_8px_30px_rgba(20,30,50,0.08),0_2px_6px_rgba(20,30,50,0.04)] transition-shadow focus-within:shadow-[0_8px_30px_rgba(20,30,50,0.10),0_0_0_1px_rgba(93,213,204,0.30)]"
+          className="flex w-full items-end gap-2 rounded-tl-[28px] rounded-tr-[32px] rounded-br-[26px] rounded-bl-[30px] bg-[radial-gradient(ellipse_at_18%_20%,rgb(255_255_255_/_0.85)_0%,rgb(255_255_255_/_0.62)_70%)] backdrop-blur-2xl px-4 py-2 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.65),0_4px_16px_rgb(20_30_50_/_0.06),0_12px_36px_rgb(20_30_50_/_0.08)] transition-shadow focus-within:shadow-[inset_0_1px_0_rgb(255_255_255_/_0.65),0_4px_16px_rgb(20_30_50_/_0.08),0_0_0_2px_rgb(93_213_204_/_0.35)]"
         >
           <ComposerPrimitive.Input
             placeholder="Where to?"
@@ -192,8 +192,12 @@ const ComposerAction: FC = () => {
 const MessageError: FC = () => {
   return (
     <MessagePrimitive.Error>
-      <ErrorPrimitive.Root className="aui-message-error-root mt-2 rounded-md border border-destructive bg-destructive/10 p-3 text-destructive text-sm dark:bg-destructive/5 dark:text-red-200">
-        <ErrorPrimitive.Message className="aui-message-error-message line-clamp-2" />
+      <ErrorPrimitive.Root className="aui-message-error-root mt-3 flex items-start gap-2.5 rounded-2xl bg-[rgb(255_220_205_/_0.60)] backdrop-blur-md px-4 py-3 text-[13px] leading-[1.5] text-ink shadow-[inset_0_1px_0_rgb(255_255_255_/_0.45)]">
+        <span aria-hidden className="mt-0.5 inline-block size-1.5 shrink-0 rounded-full bg-[#c97842]" />
+        <div className="flex-1 min-w-0">
+          <span className="font-medium">Couldn't reach the model.</span>{" "}
+          <ErrorPrimitive.Message className="aui-message-error-message text-ink/75" />
+        </div>
       </ErrorPrimitive.Root>
     </MessagePrimitive.Error>
   );
@@ -214,7 +218,7 @@ const AssistantMessage: FC = () => {
     >
       <div
         data-slot="aui_assistant-message-content"
-        className="wrap-break-word self-start max-w-[88%] rounded-tl-[28px] rounded-tr-[32px] rounded-br-[24px] rounded-bl-[16px] bg-white/50 backdrop-blur-2xl px-5 py-4 text-[15px] leading-[1.6] tracking-[-0.005em] text-ink shadow-[inset_0_1px_0_rgb(255_255_255_/_0.45),0_2px_16px_rgb(20_30_50_/_0.05)] [&_a]:text-accent-deep [&_a]:no-underline [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-accent-deep/40 [&_strong]:text-ink [&_strong]:font-semibold [&_ol]:my-2 [&_ul]:my-2 [&_li]:my-1 [&_p+p]:mt-3"
+        className="wrap-break-word self-start max-w-[88%] rounded-tl-[28px] rounded-tr-[36px] rounded-br-[22px] rounded-bl-[14px] bg-[radial-gradient(ellipse_at_22%_18%,rgb(255_255_255_/_0.65)_0%,rgb(255_255_255_/_0.42)_70%)] backdrop-blur-2xl px-5 py-4 text-[15px] leading-[1.6] tracking-[-0.005em] text-ink shadow-[inset_0_1px_0_rgb(255_255_255_/_0.55),inset_0_-1px_0_rgb(15_25_45_/_0.04),0_2px_8px_rgb(20_30_50_/_0.04),0_12px_32px_rgb(20_30_50_/_0.08)] [&_a]:text-accent-deep [&_a]:no-underline [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-accent-deep/40 [&_strong]:text-ink [&_strong]:font-semibold [&_ol]:my-2 [&_ul]:my-2 [&_li]:my-1 [&_p+p]:mt-3"
       >
         <MessagePrimitive.Parts
           components={{

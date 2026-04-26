@@ -72,6 +72,15 @@ body::before {
   pointer-events: none;
 }
 
+/* Subtle breathing pulse for streaming bubbles before first token arrives */
+@keyframes cloud-breathe {
+  0%, 100% { opacity: 0.85; transform: translateY(0); }
+  50%      { opacity: 1;    transform: translateY(-1px); }
+}
+.cloud-breathe {
+  animation: cloud-breathe 2.4s ease-in-out infinite;
+}
+
 /* Visually-hidden utility for a11y labels */
 .sr-only {
   position: absolute;
