@@ -1,0 +1,124 @@
+name: smoke-test
+
+# Daily smoke test at 09:00 Sydney time (23:00 UTC).
+# Tests login + chat on both prod URLs and opens a GitHub issue tagged @claude on failure.
+
+on:
+  schedule:
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    env:
+      BASE_URLS: "https://galavant.vercel.app https://www.galavant.global"
+      APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+      BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+
+    steps:
+      - name: Login + chat smoke test
+        id: smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          FAIL=0
+          REPORT=""
+
+          for BASE_URL in $BASE_URLS; do
+            echo "--- Testing $BASE_URL ---"
+
+            # Build optional bypass header
+            BYPASS_HEADER=""
+            if [[ -n "${BYPASS_SECRET:-}" ]]; then
+              BYPASS_HEADER="-H 'x-vercel-protection-bypass: ${BYPASS_SECRET}'"
+            fi
+
+            # Login
+            LOGIN_OUT=$(mktemp)
+            LOGIN_HTTP=$(eval curl -s -o "$LOGIN_OUT" -w '%{http_code}' \
+              -X POST "$BASE_URL/api/login" \
+              -H 'Content-Type: application/json' \
+              -d "{\"password\":\"$APP_PASSWORD\"}" \
+              -c /tmp/cookies.txt \
+              ${BYPASS_HEADER} \
+              --max-time 15)
+
+            if [[ "$LOGIN_HTTP" != "200" ]]; then
+              FAIL=1
+              EXCERPT=$(head -c 200 "$LOGIN_OUT")
+              REPORT+="- Login ($BASE_URL): **FAIL** — HTTP $LOGIN_HTTP\n"
+              REPORT+="  \`\`\`\n  $EXCERPT\n  \`\`\`\n"
+            else
+              REPORT+="- Login ($BASE_URL): **OK**\n"
+            fi
+
+            # Chat (only if login succeeded)
+            if [[ "$LOGIN_HTTP" == "200" ]]; then
+              CHAT_OUT=$(mktemp)
+              CHAT_HTTP=$(eval curl -s -o "$CHAT_OUT" -w '%{http_code}' \
+                -X POST "$BASE_URL/api/chat" \
+                -H 'Content-Type: application/json' \
+                -b /tmp/cookies.txt \
+                ${BYPASS_HEADER} \
+                -d '{"messages":[{"role":"user","content":"flights SYD to MEL tomorrow"}]}' \
+                --max-time 30)
+
+              if [[ "$CHAT_HTTP" != "200" ]]; then
+                FAIL=1
+                EXCERPT=$(head -c 200 "$CHAT_OUT")
+                REPORT+="- Chat HTTP ($BASE_URL): **FAIL** — HTTP $CHAT_HTTP\n"
+                REPORT+="  \`\`\`\n  $EXCERPT\n  \`\`\`\n"
+              else
+                # Check for a dollar amount and an https link in the streamed response
+                BODY=$(cat "$CHAT_OUT")
+                if echo "$BODY" | grep -qE '\$[0-9]+'; then
+                  REPORT+="- Dollar amount in prose ($BASE_URL): **OK**\n"
+                else
+                  FAIL=1
+                  REPORT+="- Dollar amount in prose ($BASE_URL): **FAIL** — no \$NNN found\n"
+                fi
+                if echo "$BODY" | grep -qE 'https://[a-z]'; then
+                  REPORT+="- HTTPS link in prose ($BASE_URL): **OK**\n"
+                else
+                  FAIL=1
+                  REPORT+="- HTTPS link in prose ($BASE_URL): **FAIL** — no https:// link found\n"
+                fi
+              fi
+            else
+              REPORT+="- Chat HTTP ($BASE_URL): not reached (login failed)\n"
+            fi
+
+            rm -f /tmp/cookies.txt
+          done
+
+          echo "FAIL=$FAIL" >> "$GITHUB_OUTPUT"
+          # Write report to a file to avoid env var size limits
+          printf '%b' "$REPORT" > /tmp/smoke-report.txt
+
+      - name: Open issue on failure
+        if: steps.smoke.outputs.FAIL == '1'
+        run: |
+          TIMESTAMP=$(date -u '+%Y-%m-%dT%H:%MZ')
+          REPORT=$(cat /tmp/smoke-report.txt)
+          BODY="@claude — the daily smoke test of /api/chat failed at ${TIMESTAMP}.
+
+          ## What I checked
+          ${REPORT}
+
+          ## Suggested investigation
+          1. The app's \`middleware.ts\` has no host-allowlist logic — if you see \`x-deny-reason: host_not_allowed\`, check Vercel Dashboard → Settings → Deployment Protection and verify both domains are active.
+          2. If Vercel Deployment Protection is on, ensure \`VERCEL_AUTOMATION_BYPASS_SECRET\` is set as a repo secret (Settings → Secrets) and the Vercel project has automation bypass enabled.
+          3. Architecture spec: \`docs/superpowers/specs/2026-04-25-galavant-v1-design.md\`
+
+          Please investigate and open a PR with a fix."
+
+          gh issue create \
+            --title "Daily smoke test failed: $(date -u '+%Y-%m-%d')" \
+            --body "$BODY" \
+            --label "smoke-test"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
