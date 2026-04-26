@@ -214,7 +214,7 @@ const AssistantMessage: FC = () => {
     >
       <div
         data-slot="aui_assistant-message-content"
-        className="wrap-break-word self-start max-w-[88%] rounded-3xl rounded-bl-lg bg-white/55 backdrop-blur-xl px-5 py-4 text-[15px] leading-[1.6] tracking-[-0.005em] text-ink shadow-[0_1px_12px_rgba(20,30,50,0.05)] [&_a]:text-accent-deep [&_a]:no-underline [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-accent-deep/40 [&_strong]:text-ink [&_strong]:font-semibold [&_ol]:my-2 [&_ul]:my-2 [&_li]:my-1 [&_p+p]:mt-3"
+        className="wrap-break-word self-start max-w-[88%] rounded-tl-[28px] rounded-tr-[32px] rounded-br-[24px] rounded-bl-[16px] bg-white/50 backdrop-blur-2xl px-5 py-4 text-[15px] leading-[1.6] tracking-[-0.005em] text-ink shadow-[inset_0_1px_0_rgb(255_255_255_/_0.45),0_2px_16px_rgb(20_30_50_/_0.05)] [&_a]:text-accent-deep [&_a]:no-underline [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-accent-deep/40 [&_strong]:text-ink [&_strong]:font-semibold [&_ol]:my-2 [&_ul]:my-2 [&_li]:my-1 [&_p+p]:mt-3"
       >
         <MessagePrimitive.Parts
           components={{
@@ -294,7 +294,7 @@ const UserMessage: FC = () => {
       data-role="user"
     >
       <div className="aui-user-message-content-wrapper relative col-start-2 min-w-0">
-        <div className="aui-user-message-content wrap-break-word peer rounded-3xl rounded-br-lg bg-ink/92 backdrop-blur-md px-5 py-3 text-[15px] leading-[1.5] tracking-[-0.005em] text-white shadow-[0_1px_12px_rgba(20,30,50,0.10)] empty:hidden">
+        <div className="aui-user-message-content wrap-break-word peer rounded-tl-[32px] rounded-tr-[24px] rounded-br-[16px] rounded-bl-[28px] bg-ink px-5 py-3 text-[15px] leading-[1.5] tracking-[-0.005em] text-white shadow-[0_1px_12px_rgba(20,30,50,0.10)] empty:hidden">
           <MessagePrimitive.Parts />
         </div>
         <div className="aui-user-action-bar-wrapper absolute start-0 top-1/2 -translate-x-full -translate-y-1/2 pe-2 peer-empty:hidden rtl:translate-x-full">
