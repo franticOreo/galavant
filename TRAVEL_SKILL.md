@@ -53,10 +53,17 @@ NOTE: dates are YYMMDD (no `20` prefix), airports lowercase.
 `https://www.google.com/travel/flights?q=Flights%20ORIGIN%20to%20DEST%20on%20YYYY-MM-DD%20through%20YYYY-MM-DD`
 Example: https://www.google.com/travel/flights?q=Flights%20SYD%20to%20DPS%20on%202026-06-15%20through%202026-06-22
 
-### Hotels (try freely)
+### Hotels
 
-Booking.com, Hotels.com, Trivago, Agoda all support URL-based searches. Construct based on your knowledge of their patterns. Example shape:
-- `https://www.booking.com/searchresults.html?ss=DESTINATION&checkin=YYYY-MM-DD&checkout=YYYY-MM-DD&group_adults=N`
+**Booking.com** (verified working as of 2026-04-26 spike — best hotel coverage):
+`https://www.booking.com/searchresults.html?ss=DESTINATION&checkin=YYYY-MM-DD&checkout=YYYY-MM-DD&group_adults=N`
+Example: https://www.booking.com/searchresults.html?ss=Madrid&checkin=2026-05-01&checkout=2026-05-07&group_adults=2
+Quirks: Returns prices in USD when scraped from US IPs (the default firecrawl location for `.com`); pass `&currency=AUD` (or `EUR`, `GBP`) in the URL to override. The scraped markdown is large (~180KB) — expect lots of options + filter UI noise.
+
+**Sites tested in the same spike that did NOT pass — don't waste a tool call:**
+- **Hotels.com** — Firecrawl returns only the navigation shell (~17KB); the hotel grid is lazy-loaded below the fold and current `waitFor` settings don't catch it. Could be revisited if Firecrawl adds scroll-to-bottom support.
+- **Trivago** — search is form-driven (POST), not URL-parameterized. The landing page returns only legal disclaimer text. Not viable via the current scraping approach.
+- **Agoda** — not yet spiked. You can try if Booking.com somehow fails for a query, but treat as best-effort.
 
 ### Cruises (try freely)
 
