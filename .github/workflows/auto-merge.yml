@@ -1,0 +1,28 @@
+name: auto-merge
+
+# Enables auto-merge on PRs opened by the Claude bot (or anyone) once CI passes.
+# Requires repo-level "Allow auto-merge" to be on (set via gh api below).
+# The PR itself must request auto-merge — this action does it for any claude-bot PR.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  enable-auto-merge:
+    # Only auto-merge bot PRs. Human PRs are reviewed manually.
+    if: |
+      github.event.pull_request.user.login == 'claude[bot]' ||
+      github.event.pull_request.user.login == 'app/claude' ||
+      contains(github.event.pull_request.labels.*.name, 'auto-merge')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enable auto-merge (squash)
+        run: gh pr merge --squash --auto "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

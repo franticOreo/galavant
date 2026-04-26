@@ -1,0 +1,41 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+        env:
+          # Build needs these to exist (their values don't matter — they're read at runtime).
+          AUTH_SECRET: ci-build-secret-must-be-32-chars-long
+          APP_PASSWORD: ci-build
+          OPENROUTER_API_KEY: sk-or-ci-build
+          FIRECRAWL_API_KEY: fc-ci-build
+          GITHUB_TOKEN: ghp-ci-build
+          GITHUB_REPO: franticOreo/galavant
