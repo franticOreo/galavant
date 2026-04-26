@@ -26,31 +26,35 @@ export default function LoginPage() {
     <main className="relative z-10 min-h-dvh flex items-center justify-center p-6">
       <form
         onSubmit={submit}
-        className="w-full max-w-md flex flex-col items-center gap-5 rounded-3xl border border-white/50 bg-white/32 p-8 backdrop-blur-2xl shadow-[0_8px_30px_rgba(20,30,50,0.08)]"
+        className="w-full max-w-md flex flex-col items-center gap-5 rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-assistant)] p-8 backdrop-blur-2xl shadow-[0_8px_30px_rgba(20,30,50,0.08)]"
       >
         <div className="flex flex-col items-center text-center">
-          <h1 className="font-wordmark text-[44px] leading-[0.95] text-white [text-shadow:0_2px_14px_rgb(0_0_0_/_0.22)]">
+          <h1 className="font-wordmark text-[clamp(36px,9vw,44px)] leading-[0.95] text-white [text-shadow:0_2px_14px_rgb(0_0_0_/_0.22)]">
             Galavant
           </h1>
-          <p className="font-script text-[22px] font-bold text-[#f4f6fa] -rotate-[3deg] -mt-1 [text-shadow:0_1px_3px_rgb(15_25_45_/_0.25)]">
+          <p className="font-script text-[clamp(18px,5vw,22px)] font-bold text-accent-bright -rotate-[3deg] -mt-1 [text-shadow:0_0_6px_var(--accent-glow),0_1px_2px_rgb(15_25_45_/_0.25)]">
             travel, lifted
           </p>
         </div>
+        <label htmlFor="password" className="sr-only">
+          Password
+        </label>
         <input
+          id="password"
           type="password"
           autoFocus
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
-          className="w-full rounded-full border border-white/60 bg-white/72 px-5 py-3 text-[15px] text-[#1a2540] placeholder:text-[#1a2540]/45 backdrop-blur-xl outline-none focus:ring-2 focus:ring-[#ff7a9e]/30"
+          className="w-full min-h-11 rounded-full border border-[var(--glass-border-strong)] bg-[var(--glass-composer)] px-5 py-3 text-[15px] text-ink placeholder:text-[var(--ink-muted)] backdrop-blur-xl outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-white/30"
         />
         <button
           disabled={loading || !password}
-          className="w-full rounded-full bg-[#1a2540] px-5 py-3 text-[15px] font-medium text-white transition-transform disabled:opacity-50 hover:not-disabled:scale-[1.02]"
+          className="w-full min-h-11 rounded-full bg-ink px-5 py-3 text-[15px] font-medium text-white transition-transform disabled:opacity-50 hover:not-disabled:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-white/30"
         >
           {loading ? 'Checking…' : 'Enter'}
         </button>
-        {err && <p className="text-sm text-red-200">{err}</p>}
+        {err && <p className="text-sm text-red-200" role="alert">{err}</p>}
       </form>
     </main>
   );

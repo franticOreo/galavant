@@ -104,16 +104,16 @@ const ThreadWelcome: FC = () => {
       <div className="aui-thread-welcome-center flex w-full grow flex-col items-center justify-center pb-12">
         <div className="aui-thread-welcome-message flex flex-col items-center text-center px-4">
           <h1
-            className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both font-wordmark text-[64px] leading-[0.95] text-white duration-300 [text-shadow:0_2px_14px_rgb(0_0_0_/_0.22),0_0_50px_rgb(255_255_255_/_0.12)]"
+            className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both font-wordmark text-[clamp(44px,11vw,64px)] leading-[0.95] text-white duration-300 [text-shadow:0_2px_14px_rgb(0_0_0_/_0.22),0_0_50px_rgb(255_255_255_/_0.12)]"
           >
             Galavant
           </h1>
           <p
-            className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both font-script text-[32px] font-bold text-[#f4f6fa] -rotate-[3deg] -mt-1 delay-100 duration-300 [text-shadow:0_1px_3px_rgb(15_25_45_/_0.25)]"
+            className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both font-script text-[clamp(24px,5vw,32px)] font-bold text-accent-bright -rotate-[3deg] -mt-1 delay-100 duration-300 [text-shadow:0_0_8px_var(--accent-glow),0_1px_3px_rgb(15_25_45_/_0.25)]"
           >
             travel, lifted
           </p>
-          <p className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both mt-7 text-sm text-white/78 delay-150 duration-300">
+          <p className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both mt-7 text-sm text-white/85 delay-150 duration-300">
             Plan your trip. Skip the booking-site shuffle.
           </p>
         </div>
@@ -139,7 +139,7 @@ const ThreadSuggestionItem: FC = () => {
       <SuggestionPrimitive.Trigger send asChild>
         <Button
           variant="ghost"
-          className="aui-thread-welcome-suggestion h-auto w-full @md:flex-col flex-wrap items-start justify-start gap-1 rounded-full border border-white/35 bg-white/20 px-4 py-2.5 text-start text-xs font-medium text-white backdrop-blur-xl transition-colors hover:bg-white/30 hover:border-white/45"
+          className="aui-thread-welcome-suggestion h-11 min-h-11 w-full @md:flex-col flex-wrap items-center justify-center gap-1 rounded-full border border-white/40 bg-white/30 px-5 py-2 text-center text-[13px] font-medium text-white transition-colors hover:bg-white/40 hover:border-white/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-sky-mid"
         >
           <SuggestionPrimitive.Title className="aui-thread-welcome-suggestion-text-1 font-medium" />
           <SuggestionPrimitive.Description className="aui-thread-welcome-suggestion-text-2 text-white/60 empty:hidden" />
@@ -155,12 +155,12 @@ const Composer: FC = () => {
       <ComposerPrimitive.AttachmentDropzone asChild>
         <div
           data-slot="aui_composer-shell"
-          className="flex w-full flex-col gap-2 rounded-3xl border border-white/85 bg-white/72 backdrop-blur-2xl p-(--composer-padding) shadow-[0_8px_30px_rgba(20,30,50,0.08),0_2px_6px_rgba(20,30,50,0.04)] transition-shadow focus-within:ring-2 focus-within:ring-[#ff7a9e]/30 data-[dragging=true]:border-[#ff7a9e] data-[dragging=true]:border-dashed"
+          className="flex w-full flex-col gap-2 rounded-3xl border border-[var(--glass-border-strong)] bg-[var(--glass-composer)] backdrop-blur-2xl p-(--composer-padding) shadow-[0_8px_30px_rgba(20,30,50,0.08),0_2px_6px_rgba(20,30,50,0.04)] transition-shadow focus-within:ring-2 focus-within:ring-accent/40 data-[dragging=true]:border-accent data-[dragging=true]:border-dashed"
         >
           <ComposerAttachments />
           <ComposerPrimitive.Input
             placeholder="Where to?"
-            className="aui-composer-input max-h-32 min-h-10 w-full resize-none bg-transparent px-2.5 py-1 text-[15px] text-[#1a2540] outline-none placeholder:text-[#1a2540]/45"
+            className="aui-composer-input max-h-32 min-h-11 w-full resize-none bg-transparent px-2.5 py-2 text-[15px] text-ink outline-none placeholder:text-[var(--ink-muted)]"
             rows={1}
             autoFocus
             aria-label="Message input"
@@ -184,7 +184,7 @@ const ComposerAction: FC = () => {
             type="button"
             variant="default"
             size="icon"
-            className="aui-composer-send size-8 rounded-full"
+            className="aui-composer-send size-11 rounded-full bg-ink text-white hover:bg-ink/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-white/72"
             aria-label="Send message"
           >
             <ArrowUpIcon className="aui-composer-send-icon size-4" />
@@ -233,7 +233,7 @@ const AssistantMessage: FC = () => {
     >
       <div
         data-slot="aui_assistant-message-content"
-        className="wrap-break-word self-start max-w-[78%] rounded-3xl rounded-bl-md border border-white/45 bg-white/32 backdrop-blur-2xl px-4.5 py-3 text-[14px] leading-[1.55] text-white shadow-[0_2px_18px_rgba(20,30,50,0.06)] [&_a]:text-[#ffc1cf] [&_a]:no-underline [&_a]:border-b [&_a]:border-[#ffc1cf]/55 [&_strong]:text-white [&_strong]:font-semibold"
+        className="wrap-break-word self-start max-w-[78%] rounded-3xl rounded-bl-md border border-[var(--glass-border)] bg-[var(--glass-assistant)] backdrop-blur-2xl px-4.5 py-3 text-[14px] leading-[1.55] text-ink shadow-[0_2px_18px_rgba(20,30,50,0.06)] [&_a]:text-accent-deep [&_a]:no-underline [&_a]:border-b [&_a]:border-accent-deep/55 [&_strong]:text-ink [&_strong]:font-semibold"
       >
         <MessagePrimitive.Parts
           components={{
@@ -315,7 +315,7 @@ const UserMessage: FC = () => {
       <UserMessageAttachments />
 
       <div className="aui-user-message-content-wrapper relative col-start-2 min-w-0">
-        <div className="aui-user-message-content wrap-break-word peer rounded-3xl rounded-br-md border border-white/50 bg-white/60 backdrop-blur-2xl px-4.5 py-3 text-[14px] leading-[1.55] text-[#1a2540] shadow-[0_2px_18px_rgba(20,30,50,0.06)] empty:hidden">
+        <div className="aui-user-message-content wrap-break-word peer rounded-3xl rounded-br-md border border-[var(--glass-border)] bg-[var(--glass-user)] backdrop-blur-2xl px-4.5 py-3 text-[14px] leading-[1.55] text-ink shadow-[0_2px_18px_rgba(20,30,50,0.06)] empty:hidden">
           <MessagePrimitive.Parts />
         </div>
         <div className="aui-user-action-bar-wrapper absolute start-0 top-1/2 -translate-x-full -translate-y-1/2 pe-2 peer-empty:hidden rtl:translate-x-full">
@@ -353,9 +353,9 @@ const EditComposer: FC = () => {
       data-slot="aui_edit-composer-wrapper"
       className="flex flex-col px-2"
     >
-      <ComposerPrimitive.Root className="aui-edit-composer-root ms-auto flex w-full max-w-[85%] flex-col rounded-3xl border border-white/50 bg-white/60 backdrop-blur-2xl">
+      <ComposerPrimitive.Root className="aui-edit-composer-root ms-auto flex w-full max-w-[85%] flex-col rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-user)] backdrop-blur-2xl">
         <ComposerPrimitive.Input
-          className="aui-edit-composer-input min-h-14 w-full resize-none bg-transparent p-4 text-[14px] text-[#1a2540] outline-none"
+          className="aui-edit-composer-input min-h-14 w-full resize-none bg-transparent p-4 text-[14px] text-ink outline-none"
           autoFocus
         />
         <div className="aui-edit-composer-footer mx-3 mb-3 flex items-center gap-2 self-end">

@@ -13,13 +13,13 @@ export default function Home() {
     <AssistantRuntimeProvider runtime={runtime}>
       <main className="relative z-10 mx-auto flex h-dvh max-w-2xl flex-col">
         <header className="flex items-center justify-between px-6 py-4">
-          <span className="font-wordmark text-xl tracking-normal text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.18)]">
+          <span className="font-wordmark text-xl text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.18)]">
             Galavant
           </span>
           <div className="flex items-center gap-2">
             <button
               type="button"
-              className="rounded-full border border-white/40 bg-white/20 px-3.5 py-1.5 text-xs font-medium text-white backdrop-blur-xl transition-colors hover:bg-white/30"
+              className="min-h-11 rounded-full border border-white/40 bg-white/30 px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-sky-mid"
             >
               Sign in
             </button>
