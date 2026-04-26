@@ -118,10 +118,11 @@ NOT apply `text-transform: uppercase` in CSS.
 
 ### Wordmark sizing
 
-- Empty-state hero: `124px` font-size, `0.92` line-height, `0` letter-spacing
-  (BBH Bartle's native spacing is correct — don't add letter-spacing the way
-  the Anton mockup did)
+- Empty-state hero: `80px` font-size, `0.95` line-height, `0` letter-spacing
+  (BBH Bartle's native spacing is correct — no letter-spacing override needed)
 - Header (top-left): `20px`, `0` letter-spacing
+- Tagline: `32px` Caveat 700 (was 44px when wordmark was 124px — scaled down
+  with the hero to keep proportions)
 
 ```css
 text-shadow:
