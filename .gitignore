@@ -36,3 +36,5 @@ coverage/
 # Claude Code local files
 .claude/
 .superpowers/
+.vercel
+.gstack/

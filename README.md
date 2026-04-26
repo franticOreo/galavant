@@ -2,7 +2,7 @@
 
 > A travel agent that's brutally analytical in the back, warm and opinionated in the front. Tell it about a trip, get a plan — flights, hotels, the whole thing — without having to open eight tabs and trust whichever aggregator's homepage you landed on.
 
-Live: https://galavant.vercel.app · Spec: [docs/superpowers/specs/2026-04-25-galavant-v1-design.md](docs/superpowers/specs/2026-04-25-galavant-v1-design.md)
+Live: https://www.galavant.global · Spec: [docs/superpowers/specs/2026-04-25-galavant-v1-design.md](docs/superpowers/specs/2026-04-25-galavant-v1-design.md)
 
 ## Why this exists
 

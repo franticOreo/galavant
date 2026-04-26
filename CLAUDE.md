@@ -1,6 +1,6 @@
 # Galavant — Project Brief for AI Agents
 
-You are working on **Galavant**, a conversational flight-search agent. Live URL: https://galavant.vercel.app.
+You are working on **Galavant**, a conversational flight-search agent. Live URL: https://www.galavant.global.
 
 This file is read on every agent run. Treat it as the project's brain stem — the conventions and constraints that should shape every change you make.
 
