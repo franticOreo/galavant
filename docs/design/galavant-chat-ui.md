@@ -79,26 +79,49 @@ for Safari.
 
 ## 3. Typography
 
-| Use                  | Family        | Weight | Notes                     |
-| -------------------- | ------------- | ------ | ------------------------- |
-| Wordmark (placeholder, **TBD**) | Anton  | 400    | See note below |
-| Tagline              | Caveat        | 700    | Italic feel, hand-drawn   |
-| Body / UI            | Inter         | 400/500/600 | Default font family  |
+| Use       | Family       | Weight      | Loading              |
+| --------- | ------------ | ----------- | -------------------- |
+| Wordmark  | BBH Bartle   | 400         | `next/font/google`   |
+| Tagline   | Caveat       | 700         | `next/font/google`   |
+| Body / UI | Inter        | 400/500/600 | `next/font/google`   |
 
-Load all three via `next/font/google` in `app/layout.tsx`. Caveat 400 should
-also be loaded if any future copy needs the lighter weight.
+### Loading
 
-> **Wordmark typeface is not locked.** Anton is acting as a placeholder for
-> v1. The eventual replacement is a bespoke 3D-rendered wordmark authored in
-> Figma (and exported as SVG or transparent PNG). Build the wordmark as a
-> single component (`components/galavant/wordmark.tsx`) with the typeface
-> swappable in one place. Plausible alternatives if Anton doesn't feel right:
-> Bebas Neue, Oswald, Big Shoulders Display, Archivo Black.
+All three fonts ship from Google Fonts — load via `next/font/google` in
+`app/layout.tsx`:
+
+```ts
+import { BBH_Bartle, Caveat, Inter } from 'next/font/google';
+
+const bbhBartle = BBH_Bartle({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-bbh-bartle',
+});
+const caveat = Caveat({
+  weight: ['400', '700'],
+  subsets: ['latin'],
+  variable: '--font-caveat',
+});
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+});
+```
+
+Use `font-family: 'BBH Bartle', Impact, sans-serif` for the wordmark — Impact
+is the fallback silhouette if the font fails to load.
+
+The wordmark renders the literal string `Galavant` (mixed case in source).
+The font itself produces the all-caps appearance shown in the mockup — do
+NOT apply `text-transform: uppercase` in CSS.
 
 ### Wordmark sizing
 
-- Empty-state hero: `124px` font-size, `0.92` line-height, `4px` letter-spacing
-- Header (top-left): `20px`, `2.5px` letter-spacing
+- Empty-state hero: `124px` font-size, `0.92` line-height, `0` letter-spacing
+  (BBH Bartle's native spacing is correct — don't add letter-spacing the way
+  the Anton mockup did)
+- Header (top-left): `20px`, `0` letter-spacing
 
 ```css
 text-shadow:
@@ -288,7 +311,6 @@ knows where the polish budget goes:
 
 - Animated decorations in the sky (paper plane, butterfly, particle field).
   Considered and parked.
-- Bespoke 3D wordmark (Figma-authored, replaces the Anton placeholder).
 - Tool-call result cards (flight-option cards, hotel cards) — currently
   rendered as plain markdown links.
 - Conversation history sidebar / persistence layer.
