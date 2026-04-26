@@ -1,0 +1,33 @@
+version: 2
+updates:
+  # npm packages — weekly check, group minor+patch into one PR each ecosystem
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '00:00'
+      timezone: Australia/Sydney
+    open-pull-requests-limit: 5
+    labels: ['auto-merge', 'dependencies']
+    groups:
+      # Group all minor + patch updates together — these usually pass CI cleanly
+      # and don't deserve separate review noise.
+      minor-and-patch:
+        update-types: [minor, patch]
+      # Major updates get their own PR each — they break things, deserve attention.
+      # (Dependabot opens majors as separate PRs by default when not in a group.)
+
+  # GitHub Actions — same idea, weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '00:00'
+      timezone: Australia/Sydney
+    open-pull-requests-limit: 3
+    labels: ['auto-merge', 'github-actions']
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
