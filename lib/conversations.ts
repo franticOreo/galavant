@@ -43,22 +43,48 @@ export async function recordRating({
   ts,
   rating,
   comment,
+  matchWindowMs = 10 * 60 * 1000, // 10 minutes
 }: {
   kv: Kv;
   sessionId: string;
   ts: number;
   rating: 'up' | 'down';
   comment?: string;
+  matchWindowMs?: number;
 }): Promise<boolean> {
-  const key = `conv:${sessionId}:${ts}`;
-  const existing = await kv.get<StoredTurn>(key);
-  if (!existing) return false;
+  // Try exact key first (preserves the original behavior when the caller knows the precise ts).
+  const exactKey = `conv:${sessionId}:${ts}`;
+  const exact = await kv.get<StoredTurn>(exactKey);
+  if (exact) {
+    const updated: StoredTurn = {
+      ...exact,
+      rating,
+      ...(comment !== undefined ? { comment } : {}),
+    };
+    await kv.set(exactKey, updated, { ex: TTL_SECONDS });
+    return true;
+  }
+
+  // Fallback: find the most recent UNRATED turn for this session within the match window
+  // and BEFORE the rating timestamp. This handles the common case where the user's click-time
+  // ts is later than the server-side onFinish ts.
+  const keys = await kv.keys(`conv:${sessionId}:*`);
+  let best: { key: string; turn: StoredTurn } | null = null;
+  for (const key of keys) {
+    const turn = await kv.get<StoredTurn>(key);
+    if (!turn) continue;
+    if (turn.rating !== undefined) continue; // already rated, skip
+    if (turn.ts > ts) continue; // future relative to the rating click — skip
+    if (ts - turn.ts > matchWindowMs) continue; // outside window
+    if (!best || turn.ts > best.turn.ts) best = { key, turn };
+  }
+  if (!best) return false;
   const updated: StoredTurn = {
-    ...existing,
+    ...best.turn,
     rating,
     ...(comment !== undefined ? { comment } : {}),
   };
-  await kv.set(key, updated, { ex: TTL_SECONDS });
+  await kv.set(best.key, updated, { ex: TTL_SECONDS });
   return true;
 }
 

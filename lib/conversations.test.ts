@@ -79,6 +79,68 @@ describe('recordRating', () => {
     const ok = await recordRating({ kv: kv as never, sessionId: 'nope', ts: 1, rating: 'up' });
     expect(ok).toBe(false);
   });
+
+  it('falls back to most recent unrated turn for the session within window', async () => {
+    const kv = fakeKv();
+    const now = Date.now();
+    // A turn recorded 30 seconds ago
+    kv.store.set(`conv:s1:${now - 30_000}`, {
+      sessionId: 's1', ts: now - 30_000,
+      userMessage: 'q', assistantText: 'a', toolCalls: [], durationMs: 100,
+    });
+    // The rating ts is "now" (10s after the user's read+click)
+    const ok = await recordRating({ kv: kv as never, sessionId: 's1', ts: now, rating: 'up' });
+    expect(ok).toBe(true);
+    expect(kv.store.get(`conv:s1:${now - 30_000}`)).toMatchObject({ rating: 'up' });
+  });
+
+  it('does not match turns outside the window', async () => {
+    const kv = fakeKv();
+    const now = Date.now();
+    // A turn 20 minutes ago — outside default 10min window
+    kv.store.set(`conv:s1:${now - 20 * 60_000}`, {
+      sessionId: 's1', ts: now - 20 * 60_000,
+      userMessage: 'old', assistantText: '', toolCalls: [], durationMs: 0,
+    });
+    const ok = await recordRating({ kv: kv as never, sessionId: 's1', ts: now, rating: 'up' });
+    expect(ok).toBe(false);
+  });
+
+  it('does not re-rate an already-rated turn (picks an unrated one if available)', async () => {
+    const kv = fakeKv();
+    const now = Date.now();
+    // Older turn already rated (skip)
+    kv.store.set(`conv:s1:${now - 5_000}`, {
+      sessionId: 's1', ts: now - 5_000, userMessage: 'q1', assistantText: 'a1',
+      toolCalls: [], durationMs: 0, rating: 'up',
+    });
+    // Newer turn unrated (pick this)
+    kv.store.set(`conv:s1:${now - 1_000}`, {
+      sessionId: 's1', ts: now - 1_000, userMessage: 'q2', assistantText: 'a2',
+      toolCalls: [], durationMs: 0,
+    });
+    const ok = await recordRating({ kv: kv as never, sessionId: 's1', ts: now, rating: 'down' });
+    expect(ok).toBe(true);
+    expect(kv.store.get(`conv:s1:${now - 1_000}`)).toMatchObject({ rating: 'down' });
+    // Old one untouched
+    expect(kv.store.get(`conv:s1:${now - 5_000}`)).toMatchObject({ rating: 'up' });
+  });
+
+  it('exact ts match still wins when both options exist', async () => {
+    const kv = fakeKv();
+    const now = Date.now();
+    kv.store.set(`conv:s1:${now}`, {
+      sessionId: 's1', ts: now, userMessage: 'exact', assistantText: '', toolCalls: [], durationMs: 0,
+    });
+    kv.store.set(`conv:s1:${now - 1000}`, {
+      sessionId: 's1', ts: now - 1000, userMessage: 'fallback', assistantText: '', toolCalls: [], durationMs: 0,
+    });
+    const ok = await recordRating({ kv: kv as never, sessionId: 's1', ts: now, rating: 'up' });
+    expect(ok).toBe(true);
+    expect(kv.store.get(`conv:s1:${now}`)).toMatchObject({ rating: 'up' });
+    // Fallback turn untouched
+    expect(kv.store.get(`conv:s1:${now - 1000}`)).not.toHaveProperty('rating');
+  });
 });
 
 describe('listRecentTurns', () => {
