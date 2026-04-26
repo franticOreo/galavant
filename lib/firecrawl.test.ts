@@ -35,7 +35,7 @@ describe('firecrawlScrape', () => {
     });
   });
 
-  it('trims markdown from first $ to last $ + 200', async () => {
+  it('keeps the price-bearing region and includes pre-context', async () => {
     const md = 'NAV BEFORE $100 ... $999 ' + 'X'.repeat(500);
     fetchMock.mockResolvedValueOnce(
       new Response(JSON.stringify({ data: { markdown: md } }), { status: 200 }),
@@ -43,9 +43,37 @@ describe('firecrawlScrape', () => {
     const r = await firecrawlScrape({ url: 'https://x.test', waitFor: 1000 });
     expect(r.ok).toBe(true);
     if (r.ok) {
-      expect(r.markdown.startsWith('$100')).toBe(true);
-      expect(r.markdown.length).toBeLessThan(md.length);
+      expect(r.markdown).toContain('$100');
       expect(r.markdown).toContain('$999');
+      // Pre-context (200 chars before first $) brings in nearby nav text.
+      expect(r.markdown).toContain('NAV BEFORE');
+    }
+  });
+
+  it('caps total length at 6000 chars even when input is huge', async () => {
+    const md = 'pad '.repeat(2000) + '$50 ' + 'X'.repeat(50000) + '$99';
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ data: { markdown: md } }), { status: 200 }),
+    );
+    const r = await firecrawlScrape({ url: 'https://x.test', waitFor: 1000 });
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.markdown.length).toBeLessThanOrEqual(6000);
+      expect(r.markdown).toContain('$50');
+    }
+  });
+
+  it('strips image markdown to save tokens', async () => {
+    const md = '$100 ![alt](https://img.example.com/x.png) more text $200';
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ data: { markdown: md } }), { status: 200 }),
+    );
+    const r = await firecrawlScrape({ url: 'https://x.test', waitFor: 1000 });
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.markdown).not.toContain('img.example.com');
+      expect(r.markdown).toContain('$100');
+      expect(r.markdown).toContain('$200');
     }
   });
 

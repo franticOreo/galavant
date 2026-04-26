@@ -28,10 +28,32 @@ export async function firecrawlScrape({ url, waitFor }: ScrapeArgs): Promise<Scr
 
   const json = (await res.json()) as { data?: { markdown?: string } };
   const markdown = json?.data?.markdown ?? '';
-  const first = markdown.indexOf('$');
-  const last = markdown.lastIndexOf('$');
-  const trimmed = first >= 0 && last > first ? markdown.slice(first, last + 200) : markdown;
-  return { ok: true, url, markdown: trimmed };
+  return { ok: true, url, markdown: trimMarkdown(markdown) };
+}
+
+// Hard cap of ~6KB per scrape to keep total tool output under model context budgets.
+// Strategy: collapse whitespace runs, drop image/SVG markdown, then take a window
+// around the price-bearing region. 6000 chars ≈ 1500 tokens; 3 sites = ~4500 tokens
+// of tool output, leaving room for the system prompt and chat history.
+const MAX_CHARS = 6000;
+const PRE_CONTEXT = 200;
+
+export function trimMarkdown(md: string): string {
+  if (!md) return md;
+  // Drop image/asset markdown that pads token count without info.
+  let cleaned = md
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '') // markdown images
+    .replace(/<img[^>]*>/gi, '') // raw <img>
+    .replace(/<svg[\s\S]*?<\/svg>/gi, '') // inline svgs
+    .replace(/\n{3,}/g, '\n\n') // collapse blank lines
+    .replace(/[ \t]{2,}/g, ' '); // collapse spaces
+
+  const first = cleaned.indexOf('$');
+  if (first < 0) return cleaned.length > MAX_CHARS ? cleaned.slice(0, MAX_CHARS) : cleaned;
+
+  const start = Math.max(0, first - PRE_CONTEXT);
+  const end = Math.min(cleaned.length, start + MAX_CHARS);
+  return cleaned.slice(start, end);
 }
 
 export const firecrawlTool = tool({
